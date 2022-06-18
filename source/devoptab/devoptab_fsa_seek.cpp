@@ -58,15 +58,16 @@ off_t __fsa_seek(struct _reent *r,
         return -1;
     }
 
+    uint32_t old_pos = file->offset;
+    file->offset     = offset + pos;
+
     status = FSASetPosFile(deviceData->clientHandle, file->fd, file->offset);
     if (status < 0) {
+        file->offset = old_pos;
         DEBUG_FUNCTION_LINE_ERR("FSASetPosFile(0x%08X, 0x%08X, 0x%08X) failed: %s", deviceData->clientHandle, file->fd, file->offset, FSAGetStatusStr(status));
         r->_errno = __fsa_translate_error(status);
         return -1;
     }
-
-    // Update the current offset
-    file->offset = offset + pos;
 
     return file->offset;
 }

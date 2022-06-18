@@ -155,15 +155,6 @@ MochaUtilsStatus Mocha_GetEnvironmentPath(char *environmentPathBuffer, uint32_t 
 MochaUtilsStatus Mocha_RPXHookCompleted();
 
 /**
- * Starts the MCP thread of mocha to allows usage of /dev/iosuhax and wupclient
- * @return MOCHA_RESULT_SUCCESS: Thread has been started<br>
- *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
- *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
- *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to retrieve the environment path.
- */
-MochaUtilsStatus Mocha_StartMCPThread();
-
-/**
  * Enables logging via USB (FTDI FT232 chipset only) via OSReport and friends.
  * @param avoidLogCatchup If set to true, the log start at the moment this function is called (for the first time)
  * @return MOCHA_RESULT_SUCCESS: Logging via USB starts or has already been started<br>
