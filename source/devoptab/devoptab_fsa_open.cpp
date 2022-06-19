@@ -85,6 +85,9 @@ int __fsa_open(struct _reent *r,
         if (status < 0) {
             DEBUG_FUNCTION_LINE_ERR("FSAGetPosFile(0x%08X, 0x%08X, 0x%08X) failed: %s", deviceData->clientHandle, fd, &file->offset, FSAGetStatusStr(status));
             r->_errno = __fsa_translate_error(status);
+            if (FSACloseFile(deviceData->clientHandle, fd) < 0) {
+                DEBUG_FUNCTION_LINE_ERR("FSACloseFile(0x%08X, 0x%08X) failed: %s", deviceData->clientHandle, fd, FSAGetStatusStr(status));
+            }
             return -1;
         }
     }
