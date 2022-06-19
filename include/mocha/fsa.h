@@ -2,7 +2,7 @@
 
 #include <coreinit/filesystem.h>
 #include <coreinit/filesystem_fsa.h>
-#include <cstdint>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,7 +15,7 @@ extern "C" {
  * @param outHandle pointer where the handle of the raw device will be stored
  * @return
  */
-FSError FSAEx_RawOpen(FSClient *client, char *device_path, int32_t *outHandle);
+FSError FSAEx_RawOpen(FSClient *client, const char *device_path, int32_t *outHandle);
 
 /**
  * Opens a device for raw read/write
@@ -24,7 +24,7 @@ FSError FSAEx_RawOpen(FSClient *client, char *device_path, int32_t *outHandle);
  * @param outHandle pointer where the handle of the raw device will be stored
  * @return
  */
-FSError FSAEx_RawOpenEx(FSAClientHandle clientHandle, char *device_path, int32_t *outHandle);
+FSError FSAEx_RawOpenEx(FSAClientHandle clientHandle, const char *device_path, int32_t *outHandle);
 
 /**
  * Closes a devices that was previously opened via FSAEx_RawOpen

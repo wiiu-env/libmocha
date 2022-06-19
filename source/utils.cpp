@@ -30,24 +30,6 @@ MochaUtilsStatus Mocha_InitLibrary() {
     }
 
     if (iosuhaxHandle < 0) {
-        auto res  = MOCHA_RESULT_UNKNOWN_ERROR;
-        int mcpFd = IOS_Open("/dev/mcp", (IOSOpenMode) 0);
-        if (mcpFd >= 0) {
-            ALIGN_0x40 uint32_t io_buffer[0x40 / 4];
-            io_buffer[0] = IPC_CUSTOM_START_MCP_THREAD;
-            if (IOS_Ioctl(mcpFd, 100, io_buffer, 4, io_buffer, 0x4) == IOS_ERROR_OK) {
-                if (io_buffer[0] != 1) { // Thread is starting
-                    OSSleepTicks(OSMillisecondsToTicks(50));
-                }
-                res = MOCHA_RESULT_SUCCESS;
-            }
-
-            IOS_Close(mcpFd);
-        }
-        if (res != MOCHA_RESULT_SUCCESS) {
-            return res;
-        }
-
         int haxHandle = IOS_Open((char *) ("/dev/iosuhax"), static_cast<IOSOpenMode>(0));
         if (haxHandle < 0) {
             DEBUG_FUNCTION_LINE_ERR("Failed to open /dev/iosuhax");

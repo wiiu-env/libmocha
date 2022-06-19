@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-enum MochaUtilsStatus {
+typedef enum MochaUtilsStatus {
     MOCHA_RESULT_SUCCESS                 = 0,
     MOCHA_RESULT_INVALID_ARGUMENT        = -0x01,
     MOCHA_RESULT_MAX_CLIENT              = -0x02,
@@ -21,7 +21,7 @@ enum MochaUtilsStatus {
     MOCHA_RESULT_UNSUPPORTED_COMMAND     = -0x11,
     MOCHA_RESULT_LIB_UNINITIALIZED       = -0x20,
     MOCHA_RESULT_UNKNOWN_ERROR           = -0x100,
-};
+} MochaUtilsStatus;
 
 /**
  * Initializes the mocha lib. Needs to be called before any other functions can be used
