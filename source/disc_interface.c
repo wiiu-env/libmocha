@@ -23,8 +23,8 @@
  ***************************************************************************/
 #include "mocha/disc_interface.h"
 #include <coreinit/ios.h>
-#include <mocha/fsa.h>
-#include <mocha/mocha.h>
+#include "mocha/fsa.h"
+#include "mocha/mocha.h"
 #include <stdbool.h>
 
 #define FSA_REF_SD  0x01

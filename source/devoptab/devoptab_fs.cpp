@@ -3,7 +3,6 @@
 #include "mocha/mocha.h"
 #include <coreinit/cache.h>
 #include <coreinit/filesystem_fsa.h>
-#include <mocha/mocha.h>
 #include <mutex>
 
 static const devoptab_t fsa_default_devoptab = {
