@@ -34,7 +34,7 @@ int __fsa_dirnext(struct _reent *r,
     memset(filestat, 0, sizeof(struct stat));
     filestat->st_dev     = (dev_t) deviceData->clientHandle;
     filestat->st_ino     = dir->entry_data.info.entryId;
-    filestat->st_mode    = __fsa_translate_stat_mode(dir->entry_data.info);
+    filestat->st_mode    = __fsa_translate_stat_mode(&dir->entry_data.info);
     filestat->st_nlink   = 1;
     filestat->st_uid     = dir->entry_data.info.owner;
     filestat->st_gid     = dir->entry_data.info.group;

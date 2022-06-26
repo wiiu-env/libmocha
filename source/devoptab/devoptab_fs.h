@@ -102,7 +102,7 @@ char *__fsa_fixpath(struct _reent *r, const char *path);
 int __fsa_translate_error(FSError error);
 time_t __fsa_translate_time(FSTime timeValue);
 FSMode __fsa_translate_permission_mode(int mode);
-mode_t __fsa_translate_stat_mode(FSStat fileStat);
+mode_t __fsa_translate_stat_mode(FSStat *fileStat);
 
 #ifdef __cplusplus
 }

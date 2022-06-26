@@ -38,22 +38,22 @@ __fsa_fixpath(struct _reent *r,
     return fixedPath;
 }
 
-mode_t __fsa_translate_stat_mode(FSStat fileStat) {
+mode_t __fsa_translate_stat_mode(FSStat *fileStat) {
     mode_t retMode = 0;
 
-    if ((fileStat.flags & FS_STAT_LINK) == FS_STAT_LINK) {
+    if ((fileStat->flags & FS_STAT_LINK) == FS_STAT_LINK) {
         retMode |= S_IFLNK;
-    } else if ((fileStat.flags & FS_STAT_DIRECTORY) == FS_STAT_DIRECTORY) {
+    } else if ((fileStat->flags & FS_STAT_DIRECTORY) == FS_STAT_DIRECTORY) {
         retMode |= S_IFDIR;
-    } else if ((fileStat.flags & FS_STAT_FILE) == FS_STAT_FILE) {
+    } else if ((fileStat->flags & FS_STAT_FILE) == FS_STAT_FILE) {
         retMode |= S_IFREG;
-    } else if (fileStat.size > 0) {
+    } else if (fileStat->size > 0) {
         // Some regular Wii U files have no type info but will have a size
         retMode |= S_IFREG;
     }
 
     // Convert normal CafeOS hexadecimal permission bits into Unix octal permission bits
-    mode_t permissionMode = (((fileStat.mode >> 2) & S_IRWXU) | ((fileStat.mode >> 1) & S_IRWXG) | (fileStat.mode & S_IRWXO));
+    mode_t permissionMode = (((fileStat->mode >> 2) & S_IRWXU) | ((fileStat->mode >> 1) & S_IRWXG) | (fileStat->mode & S_IRWXO));
 
     return retMode | permissionMode;
 }

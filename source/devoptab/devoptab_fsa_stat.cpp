@@ -35,7 +35,7 @@ int __fsa_stat(struct _reent *r,
     memset(st, 0, sizeof(struct stat));
     st->st_dev     = (dev_t) deviceData->clientHandle;
     st->st_ino     = fsStat.entryId;
-    st->st_mode    = __fsa_translate_stat_mode(fsStat);
+    st->st_mode    = __fsa_translate_stat_mode(&fsStat);
     st->st_nlink   = 1;
     st->st_uid     = fsStat.owner;
     st->st_gid     = fsStat.group;

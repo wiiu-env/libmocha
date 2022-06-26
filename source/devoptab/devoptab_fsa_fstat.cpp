@@ -32,7 +32,7 @@ int __fsa_fstat(struct _reent *r,
     st->st_uid   = fsStat.owner;
     st->st_gid   = fsStat.group;
     st->st_nlink = 1;
-    st->st_mode  = __fsa_translate_stat_mode(fsStat);
+    st->st_mode  = __fsa_translate_stat_mode(&fsStat);
     st->st_atime = __fsa_translate_time(fsStat.modified);
     st->st_ctime = __fsa_translate_time(fsStat.created);
     st->st_mtime = __fsa_translate_time(fsStat.modified);
