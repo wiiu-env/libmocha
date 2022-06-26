@@ -2,7 +2,7 @@
 
 #include <coreinit/filesystem.h>
 #include <coreinit/filesystem_fsa.h>
-#include <mocha/commands.h>
+#include "commands.h"
 #include <stdint.h>
 
 #ifdef __cplusplus
