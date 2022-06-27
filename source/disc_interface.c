@@ -22,9 +22,9 @@
  * distribution.
  ***************************************************************************/
 #include "mocha/disc_interface.h"
-#include <coreinit/ios.h>
 #include "mocha/fsa.h"
 #include "mocha/mocha.h"
+#include <coreinit/ios.h>
 #include <stdbool.h>
 
 #define FSA_REF_SD  0x01
@@ -53,7 +53,7 @@ static bool Mocha_disc_io_fsa_open(int fsaFd) {
     if (fsaFd == FSA_REF_SD) {
         if (fsaFdSd < 0) {
             fsaFdSd = IOS_Open("/dev/fsa", IOS_OPEN_READWRITE);
-            if(fsaFdSd >= 0 && Mocha_UnlockFSClientEx(fsaFdSd) != MOCHA_RESULT_SUCCESS){
+            if (fsaFdSd >= 0 && Mocha_UnlockFSClientEx(fsaFdSd) != MOCHA_RESULT_SUCCESS) {
                 IOS_Close(fsaFdSd);
                 fsaFdSd = -1;
             }
@@ -64,7 +64,7 @@ static bool Mocha_disc_io_fsa_open(int fsaFd) {
     } else if (fsaFd == FSA_REF_USB) {
         if (fsaFdUsb < 0) {
             fsaFdUsb = IOS_Open("/dev/fsa", IOS_OPEN_READWRITE);
-            if(fsaFdUsb >= 0 && Mocha_UnlockFSClientEx(fsaFdUsb) != MOCHA_RESULT_SUCCESS){
+            if (fsaFdUsb >= 0 && Mocha_UnlockFSClientEx(fsaFdUsb) != MOCHA_RESULT_SUCCESS) {
                 IOS_Close(fsaFdUsb);
                 fsaFdUsb = -1;
             }

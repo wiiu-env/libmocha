@@ -1,8 +1,8 @@
 #pragma once
 
+#include "commands.h"
 #include <coreinit/filesystem.h>
 #include <coreinit/filesystem_fsa.h>
-#include "commands.h"
 #include <stdint.h>
 
 #ifdef __cplusplus

@@ -1,20 +1,20 @@
 
 #include "mocha.h"
-#include <stdint.h>
 #include <assert.h>
+#include <stdint.h>
 
 // Ensure structs are correct size & offsets
 #if defined(static_assert) || defined(__cplusplus)
-#  define MOCHA_CHECK_SIZE(Type, Size) \
-      static_assert(sizeof(Type) == Size, \
-                    #Type " must be " #Size " bytes")
+#define MOCHA_CHECK_SIZE(Type, Size)    \
+    static_assert(sizeof(Type) == Size, \
+                  #Type " must be " #Size " bytes")
 
-#  define MOCHA_CHECK_OFFSET(Type, Offset, Field) \
-      static_assert(offsetof(Type, Field) == Offset, \
-                    #Type "::" #Field " must be at offset " #Offset)
+#define MOCHA_CHECK_OFFSET(Type, Offset, Field)    \
+    static_assert(offsetof(Type, Field) == Offset, \
+                  #Type "::" #Field " must be at offset " #Offset)
 #else
-#  define MOCHA_CHECK_SIZE(Type, Size)
-#  define MOCHA_CHECK_OFFSET(Type, Offset, Field)
+#define MOCHA_CHECK_SIZE(Type, Size)
+#define MOCHA_CHECK_OFFSET(Type, Offset, Field)
 #endif
 
 #ifdef __cplusplus
@@ -23,14 +23,14 @@ extern "C" {
 
 typedef enum OTPSecurityLevel {
     // Combined flags as found in consoles
-    SECURITY_RETAIL_STATE                = 0x90000000,
-    SECURITY_DEBUG_STATE                 = 0x88000000,
-    SECURITY_FACTORY_STATE               = 0x00000000,
+    SECURITY_RETAIL_STATE  = 0x90000000,
+    SECURITY_DEBUG_STATE   = 0x88000000,
+    SECURITY_FACTORY_STATE = 0x00000000,
     // Flags
-    SECURITY_FLAG_UNKNOWN                = 0x40000000, // Unknown, causes error in boot0
-    SECURITY_FLAG_CONSOLE_PROGRAMMED     = 0x80000000, // Console type has been programmed
-    SECURITY_FLAG_USE_DEBUG_KEY_IMAGE    = 0x08000000, // Use first RSA key and debug ancast images in boot0
-    SECURITY_FLAG_USE_RETAIL_KEY_IMAGE   = 0x10000000  // Use second RSA key and retail ancast images in boot0
+    SECURITY_FLAG_UNKNOWN              = 0x40000000, // Unknown, causes error in boot0
+    SECURITY_FLAG_CONSOLE_PROGRAMMED   = 0x80000000, // Console type has been programmed
+    SECURITY_FLAG_USE_DEBUG_KEY_IMAGE  = 0x08000000, // Use first RSA key and debug ancast images in boot0
+    SECURITY_FLAG_USE_RETAIL_KEY_IMAGE = 0x10000000  // Use second RSA key and retail ancast images in boot0
 } OTPSecurityLevel;
 
 typedef enum OTPIOStrength {
@@ -43,8 +43,8 @@ typedef enum OTPIOStrength {
 } OTPIOStrength;
 
 typedef enum OTPPulseLength {
-    PULSE_BOOT0     = 0x0000002F,
-    PULSE_NONE      = 0x00000000
+    PULSE_BOOT0 = 0x0000002F,
+    PULSE_NONE  = 0x00000000
 } OTPPulseLength;
 
 typedef enum OTPJtagStatus {
