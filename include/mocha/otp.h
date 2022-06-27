@@ -1,21 +1,8 @@
-
+#pragma once
 #include "mocha.h"
 #include <assert.h>
 #include <stdint.h>
-
-// Ensure structs are correct size & offsets
-#if defined(static_assert) || defined(__cplusplus)
-#define MOCHA_CHECK_SIZE(Type, Size)    \
-    static_assert(sizeof(Type) == Size, \
-                  #Type " must be " #Size " bytes")
-
-#define MOCHA_CHECK_OFFSET(Type, Offset, Field)    \
-    static_assert(offsetof(Type, Field) == Offset, \
-                  #Type "::" #Field " must be at offset " #Offset)
-#else
-#define MOCHA_CHECK_SIZE(Type, Size)
-#define MOCHA_CHECK_OFFSET(Type, Offset, Field)
-#endif
+#include <wut.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,7 +49,7 @@ typedef struct OTPWiiBank {
     uint8_t rngKey[0x10];
     uint8_t unknownOrPadding[0x08];
 } OTPWiiBank;
-MOCHA_CHECK_SIZE(OTPWiiBank, 0x80);
+WUT_CHECK_SIZE(OTPWiiBank, 0x80);
 
 typedef struct OTPWiiUBank {
     OTPSecurityLevel securityLevel;
@@ -91,7 +78,7 @@ typedef struct OTPWiiUBank {
     uint8_t slcHmac[0x14];
     uint8_t unknown8[0x0C];
 } OTPWiiUBank;
-MOCHA_CHECK_SIZE(OTPWiiUBank, 0x180);
+WUT_CHECK_SIZE(OTPWiiUBank, 0x180);
 
 typedef struct OTPWiiUNGBank {
     uint8_t unknown1[0x10];
@@ -102,7 +89,7 @@ typedef struct OTPWiiUNGBank {
     uint8_t otpRNGSeed[0x10];
     uint8_t unknown3[0x10];
 } OTPWiiUNGBank;
-MOCHA_CHECK_SIZE(OTPWiiUNGBank, 0x80);
+WUT_CHECK_SIZE(OTPWiiUNGBank, 0x80);
 
 
 typedef struct OTPWiiUCertBank {
@@ -113,7 +100,7 @@ typedef struct OTPWiiUCertBank {
     uint8_t unknown1[0x18];
     uint8_t unknown2_protected[0x20];
 } OTPWiiUCertBank;
-MOCHA_CHECK_SIZE(OTPWiiUCertBank, 0x80);
+WUT_CHECK_SIZE(OTPWiiUCertBank, 0x80);
 
 typedef struct OTPWiiCertBank {
     uint32_t rootCertMSId;
@@ -124,7 +111,7 @@ typedef struct OTPWiiCertBank {
     uint8_t unknown1[0x08];
     uint8_t privateNSSDeviceCertKey[0x20];
 } OTPWiiCertBank;
-MOCHA_CHECK_SIZE(OTPWiiCertBank, 0x80);
+WUT_CHECK_SIZE(OTPWiiCertBank, 0x80);
 
 typedef struct OTPMiscBank {
     uint8_t unknown1_protected[0x20];
@@ -138,7 +125,7 @@ typedef struct OTPMiscBank {
     uint8_t padding3[0x04];
     OTPJtagStatus jtagStatus;
 } OTPMiscBank;
-MOCHA_CHECK_SIZE(OTPMiscBank, 0x80);
+WUT_CHECK_SIZE(OTPMiscBank, 0x80);
 
 typedef struct WiiUConsoleOTP {
     OTPWiiBank wiiBank;
@@ -148,7 +135,7 @@ typedef struct WiiUConsoleOTP {
     OTPWiiCertBank wiiCertBank;
     OTPMiscBank miscBank;
 } WiiUConsoleOTP;
-MOCHA_CHECK_SIZE(WiiUConsoleOTP, 0x400);
+WUT_CHECK_SIZE(WiiUConsoleOTP, 0x400);
 
 /**
  * Read the consoles OTP into the given buffer.

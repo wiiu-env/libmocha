@@ -1,5 +1,4 @@
 #pragma once
-
 #include "commands.h"
 #include <coreinit/filesystem.h>
 #include <coreinit/filesystem_fsa.h>
