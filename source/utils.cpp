@@ -2,6 +2,7 @@
 #include "logger.h"
 #include "mocha/commands.h"
 #include "mocha/mocha.h"
+#include "mocha/otp.h"
 #include <coreinit/ios.h>
 #include <cstring>
 #include <malloc.h>

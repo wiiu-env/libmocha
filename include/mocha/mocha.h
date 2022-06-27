@@ -106,21 +106,6 @@ MochaUtilsStatus Mocha_IOSUKernelWrite32(uint32_t address, uint32_t value);
  */
 MochaUtilsStatus Mocha_IOSUKernelRead32(uint32_t address, uint32_t *out_buffer);
 
-typedef struct WiiUConsoleOTP {
-    uint8_t data[0x400];
-} WiiUConsoleOTP;
-
-/**
- * Read the consoles OTP into the given buffer.
- *
- * @param out_buffer Buffer where the result will be stored.
- * @return MOCHA_RESULT_SUCCESS: The OTP has been read into the buffer<br>
- *         MOCHA_RESULT_INVALID_ARGUMENT: invalid environmentPathBuffer pointer or bufferLen \< 0x100<br>
- *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
- *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to retrieve the environment path.
- */
-MochaUtilsStatus Mocha_ReadOTP(WiiUConsoleOTP *out_buffer);
-
 /**
  * Calls an iosu SVC.
  * @param svc_id
