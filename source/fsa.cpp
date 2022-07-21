@@ -6,14 +6,14 @@
 #include <cstring>
 #include <malloc.h>
 
-FSError FSAEx_RawOpen(FSClient *client, char *device_path, int32_t *outHandle) {
+FSError FSAEx_RawOpen(FSClient *client, const char *device_path, int32_t *outHandle) {
     if (!client) {
         return FS_ERROR_INVALID_CLIENTHANDLE;
     }
     return FSAEx_RawOpenEx(FSGetClientBody(client)->clientHandle, device_path, outHandle);
 }
 
-FSError FSAEx_RawOpenEx(int clientHandle, char *device_path, int32_t *outHandle) {
+FSError FSAEx_RawOpenEx(int clientHandle, const char *device_path, int32_t *outHandle) {
     if (!outHandle) {
         return FS_ERROR_INVALID_BUFFER;
     }
