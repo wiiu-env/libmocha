@@ -86,7 +86,54 @@ MochaUtilsStatus Mocha_UnlockFSClient(FSClient *client);
  */
 MochaUtilsStatus Mocha_UnlockFSClientEx(int clientHandle);
 
-MochaUtilsStatus Mocha_LoadRPXOnNextLaunch(MochaRPXLoadInfo *loadInfo);
+/**
+ * Set the .rpx that will be loaded the next time the homebrew wrapper application is launched (e.g. Health & Safety or Daily Log).
+ * <br>
+ * Loading a .rpx from within a file (archive e.g. a WUHB) is supported. <br>
+ * To achieve this, the fileoffset (offset inside file specified via path) and filesize (size of the .rpx) need to be set. <br>
+ * If filesize is set to 0, the whole file (starting at fileoffset) will be loaded as .rpx <br>
+ * <br>
+ * The path is **relative** to the root of the given target device.<br>
+ * The target LOAD_RPX_TARGET_EXTRA_REVERT_PREPARE will revert a prepare call. <br>
+ * <br>
+ * To launch the prepared RPX call Mocha_LaunchHomebrewWrapper if this call was successful.
+ *
+ * @param loadInfo Information about the .rpx replacement.
+ * @return MOCHA_RESULT_SUCCESS: Loading the next RPX will be redirected. <br>
+ *         MOCHA_RESULT_INVALID_ARGUMENT: The given loadInfo was NULL <br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to setup a redirect of RPX.
+ */
+MochaUtilsStatus Mocha_PrepareRPXLaunch(MochaRPXLoadInfo *loadInfo);
+
+/**
+ * Launches the wrapper app for launching .rpx  <br>
+ * To launch a RPX call `Mocha_PrepareRPXLaunch` before this function. <br>
+ * <br>
+ * see: `Mocha_LaunchRPX` to prepare and launch a RPX in one command.
+ *
+ * @return MOCHA_RESULT_SUCCESS: App is launching<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_NOT_FOUND: Not application that can be used as homebrew wrapper found.
+ */
+MochaUtilsStatus Mocha_LaunchHomebrewWrapper();
+
+/**
+ * Launches a given RPX by launching a wrapper application and replacing the RPX on the fly. <br>
+ * See Mocha_PrepareRPXLaunch for more information. <br>
+ *
+ * Note: Combines Mocha_PrepareRPXLaunch and Mocha_LaunchHomebrewWrapper.
+ * @param loadInfo
+ * @return MOCHA_RESULT_SUCCESS: Requested RPX will be launched<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_INVALID_ARGUMENT: The given loadInfo was NULL <br>
+ *         MOCHA_RESULT_NOT_FOUND: Not application that can be used as homebrew wrapper found.
+ *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to setup a redirect of RPX.
+ */
+MochaUtilsStatus Mocha_LaunchRPX(MochaRPXLoadInfo *loadInfo);
 
 typedef struct WUDDiscKey {
     uint8_t key[0x10];
