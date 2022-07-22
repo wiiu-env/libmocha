@@ -14,7 +14,8 @@ extern "C" {
 #define IPC_CUSTOM_GET_MOCHA_API_VERSION  0xF8
 
 typedef enum LoadRPXTargetEnum {
-    LOAD_RPX_TARGET_SD_CARD = 0,
+    LOAD_RPX_TARGET_SD_CARD              = 0,
+    LOAD_RPX_TARGET_EXTRA_REVERT_PREPARE = 0x42424242,
 } LoadRPXTargetEnum;
 
 typedef struct __attribute((packed)) {

@@ -4,6 +4,8 @@
 #include <coreinit/ios.h>
 #include <cstring>
 #include <stdint.h>
+#include <sysapp/launch.h>
+#include <sysapp/title.h>
 
 int mochaInitDone        = 0;
 uint32_t mochaApiVersion = 0;
@@ -131,12 +133,15 @@ MochaUtilsStatus Mocha_UnlockFSClientEx(int clientHandle) {
     return MOCHA_RESULT_UNKNOWN_ERROR;
 }
 
-MochaUtilsStatus Mocha_LoadRPXOnNextLaunch(MochaRPXLoadInfo *loadInfo) {
+MochaUtilsStatus Mocha_PrepareRPXLaunch(MochaRPXLoadInfo *loadInfo) {
     if (!mochaInitDone) {
         return MOCHA_RESULT_LIB_UNINITIALIZED;
     }
     if (mochaApiVersion < 1) {
         return MOCHA_RESULT_UNSUPPORTED_COMMAND;
+    }
+    if (!loadInfo) {
+        return MOCHA_RESULT_INVALID_ARGUMENT;
     }
     MochaUtilsStatus res = MOCHA_RESULT_UNKNOWN_ERROR;
     int mcpFd            = IOS_Open("/dev/mcp", (IOSOpenMode) 0);
@@ -148,11 +153,43 @@ MochaUtilsStatus Mocha_LoadRPXOnNextLaunch(MochaRPXLoadInfo *loadInfo) {
         if (IOS_Ioctl(mcpFd, 100, io_buffer, sizeof(MochaRPXLoadInfo) + 4, io_buffer, 0x4) == IOS_ERROR_OK) {
             res = MOCHA_RESULT_SUCCESS;
         }
-
         IOS_Close(mcpFd);
     }
 
     return res;
+}
+
+MochaUtilsStatus Mocha_LaunchRPX(MochaRPXLoadInfo *loadInfo) {
+    auto res = Mocha_PrepareRPXLaunch(loadInfo);
+    if (res == MOCHA_RESULT_SUCCESS) {
+        res = Mocha_LaunchHomebrewWrapper();
+        if (res != MOCHA_RESULT_SUCCESS) {
+            MochaRPXLoadInfo loadInfoRevert;
+            loadInfoRevert.target = LOAD_RPX_TARGET_EXTRA_REVERT_PREPARE;
+            Mocha_PrepareRPXLaunch(&loadInfoRevert);
+        }
+    }
+    return res;
+}
+
+MochaUtilsStatus Mocha_LaunchHomebrewWrapper() {
+    if (!mochaInitDone) {
+        return MOCHA_RESULT_LIB_UNINITIALIZED;
+    }
+    if (mochaApiVersion < 1) {
+        return MOCHA_RESULT_UNSUPPORTED_COMMAND;
+    }
+    uint64_t titleID = _SYSGetSystemApplicationTitleId(SYSTEM_APP_ID_HEALTH_AND_SAFETY);
+    if (!SYSCheckTitleExists(titleID)) { // Fallback to daily log app if H&S doesn't exist.
+        titleID = _SYSGetSystemApplicationTitleId(SYSTEM_APP_ID_DAILY_LOG);
+    }
+    if (!SYSCheckTitleExists(titleID)) {
+        return MOCHA_RESULT_NOT_FOUND;
+    }
+
+    _SYSLaunchTitleWithStdArgsInNoSplash(titleID, nullptr);
+
+    return MOCHA_RESULT_SUCCESS;
 }
 
 MochaUtilsStatus Mocha_ODMGetDiscKey(WUDDiscKey *discKey) {
