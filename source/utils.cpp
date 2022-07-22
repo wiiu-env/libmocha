@@ -80,7 +80,7 @@ MochaUtilsStatus Mocha_GetEnvironmentPath(char *environmentPathBuffer, uint32_t 
     return res;
 }
 
-MochaUtilsStatus Mocha_StartUSBLogging(bool avoidLogCatchup) {
+MochaUtilsStatus Mocha_StartUSBLogging(bool notSkipExistingLogs) {
     if (!mochaInitDone) {
         return MOCHA_RESULT_LIB_UNINITIALIZED;
     }
@@ -92,7 +92,7 @@ MochaUtilsStatus Mocha_StartUSBLogging(bool avoidLogCatchup) {
     if (mcpFd >= 0) {
         ALIGN_0x40 uint32_t io_buffer[0x40 / 4];
         io_buffer[0] = IPC_CUSTOM_START_USB_LOGGING;
-        io_buffer[1] = avoidLogCatchup;
+        io_buffer[1] = notSkipExistingLogs;
 
         if (IOS_Ioctl(mcpFd, 100, io_buffer, 8, io_buffer, 0x4) == IOS_ERROR_OK) {
             res = MOCHA_RESULT_SUCCESS;
