@@ -2,8 +2,10 @@
 #include "logger.h"
 #include <mutex>
 
-// Use this extended hidden flag value to provide FS_OPEN_FLAG_ENCRYPTED in underlying FSOpenFileEx() call
-#define O_ENCRYPTED 0x4000000
+// Extended "magic" value that allows opening files with FS_OPEN_FLAG_UNENCRYPTED in underlying FSOpenFileEx() call similar to O_DIRECTORY
+#ifndef O_UNENCRYPTED
+#define O_UNENCRYPTED 0x4000000
+#endif
 
 int __fsa_open(struct _reent *r,
                void *fileStruct,
@@ -21,29 +23,19 @@ int __fsa_open(struct _reent *r,
     }
 
     // Map flags to open modes
-    if ((flags & O_ACCMODE) == O_RDONLY) {
+    int commonFlagMask = O_CREAT | O_TRUNC | O_APPEND;
+    if (((flags & O_ACCMODE) == O_RDONLY) && !(flags & commonFlagMask)) {
         fsMode = "r";
-        if (flags & O_APPEND) {
-            r->_errno = EINVAL;
-            return -1;
-        }
-    } else if ((flags & O_ACCMODE) == O_WRONLY) {
-        if (flags & O_APPEND) {
-            fsMode = "a";
-        } else if (flags & O_TRUNC) {
-            fsMode = "w";
-        } else {
-            r->_errno = EINVAL;
-            return -1;
-        }
-    } else if ((flags & O_ACCMODE) == O_RDWR) {
-        if (flags & O_APPEND) {
-            fsMode = "a+";
-        } else if (flags & O_TRUNC) {
-            fsMode = "w+";
-        } else {
-            fsMode = "r+";
-        }
+    } else if (((flags & O_ACCMODE) == O_RDWR) && !(flags & commonFlagMask)) {
+        fsMode = "r+";
+    } else if (((flags & O_ACCMODE) == O_WRONLY) && ((flags & commonFlagMask) == (O_CREAT | O_TRUNC))) {
+        fsMode = "w";
+    } else if (((flags & O_ACCMODE) == O_RDWR) && ((flags & commonFlagMask) == (O_CREAT | O_TRUNC))) {
+        fsMode = "w+";
+    } else if (((flags & O_ACCMODE) == O_WRONLY) && ((flags & commonFlagMask) == (O_CREAT | O_APPEND))) {
+        fsMode = "a";
+    } else if (((flags & O_ACCMODE) == O_RDWR) && ((flags & commonFlagMask) == (O_CREAT | O_APPEND))) {
+        fsMode = "a+";
     } else {
         r->_errno = EINVAL;
         return -1;
@@ -56,7 +48,7 @@ int __fsa_open(struct _reent *r,
     }
 
     // Open the file
-    FSOpenFileFlags openFlags = (mode & O_ENCRYPTED) ? FS_OPEN_FLAG_ENCRYPTED : FS_OPEN_FLAG_NONE;
+    FSOpenFileFlags openFlags = (mode & O_UNENCRYPTED) ? FS_OPEN_FLAG_ENCRYPTED : FS_OPEN_FLAG_NONE;
 
     auto *deviceData = (FSADeviceData *) r->deviceData;
 
