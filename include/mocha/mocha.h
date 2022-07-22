@@ -12,6 +12,7 @@ typedef enum MochaUtilsStatus {
     MOCHA_RESULT_SUCCESS                 = 0,
     MOCHA_RESULT_INVALID_ARGUMENT        = -0x01,
     MOCHA_RESULT_MAX_CLIENT              = -0x02,
+    MOCHA_RESULT_NOT_FOUND               = -0x06,
     MOCHA_RESULT_UNSUPPORTED_API_VERSION = -0x10,
     MOCHA_RESULT_UNSUPPORTED_COMMAND     = -0x11,
     MOCHA_RESULT_LIB_UNINITIALIZED       = -0x20,
@@ -90,6 +91,17 @@ typedef struct WUDDiscKey {
     uint8_t key[0x10];
 } WUDDiscKey;
 
+/**
+ * Reads the disc key (used to decrypt the SI partition) of the inserted disc.
+ *
+ * @param discKey target buffer where the result will be stored.
+ * @return MOCHA_RESULT_SUCCESS: The disc key of the inserted disc has been read into the given buffer.<br>
+ *         MOCHA_RESULT_INVALID_ARGUMENT: The given discKey buffer was NULL <br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_NOT_FOUND: Failed to obtain disc key, no disc inserted?.
+ *         MOCHA_RESULT_UNKNOWN_ERROR: Unknown error.
+ */
 MochaUtilsStatus Mocha_ODMGetDiscKey(WUDDiscKey *discKey);
 
 MochaUtilsStatus Mocha_SEEPROMRead(uint8_t *out_buffer, uint32_t offset, uint32_t size);

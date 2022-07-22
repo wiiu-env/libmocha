@@ -170,11 +170,13 @@ MochaUtilsStatus Mocha_ODMGetDiscKey(WUDDiscKey *discKey) {
     if (odm_handle >= 0) {
         ALIGN_0x40 uint32_t io_buffer[0x40 / 4];
         // disc encryption key, only works with patched IOSU
-        io_buffer[0] = 3;
-
-        if (IOS_Ioctl(odm_handle, 0x06, io_buffer, 0x14, io_buffer, 0x20) == IOS_ERROR_OK) {
+        io_buffer[0]         = 3;
+        IOSError ioctlResult = IOS_Ioctl(odm_handle, 0x06, io_buffer, 0x14, io_buffer, 0x20);
+        if (ioctlResult == IOS_ERROR_OK) {
             memcpy(discKey, io_buffer, 16);
             res = MOCHA_RESULT_SUCCESS;
+        } else if (ioctlResult == (IOSError) 0xFFF1EFFF) {
+            res = MOCHA_RESULT_NOT_FOUND;
         }
         IOS_Close(odm_handle);
     }
