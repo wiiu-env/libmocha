@@ -25,7 +25,8 @@ VERSION	:=	$(VER_MAJOR).$(VER_MINOR).$(VER_PATCH)
 #-------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	source
+SOURCES		:=	source \
+				source/devoptab
 DATA		:=	data
 INCLUDES	:=	source \
 				include \
@@ -38,7 +39,7 @@ CFLAGS	:=	-Wall -Werror -save-temps \
 			$(MACHDEP) \
 			$(BUILD_CFLAGS)
 
-CFLAGS	+=	$(INCLUDE) -D__WIIU__ -D__WUT__
+CFLAGS	+=	$(INCLUDE) -D__WIIU__ -D__WUT__ -fno-exceptions
 
 CXXFLAGS	:= $(CFLAGS) -std=gnu++20
 
