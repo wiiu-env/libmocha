@@ -50,14 +50,15 @@ MochaUtilsStatus Mocha_CheckAPIVersion(uint32_t *outVersion);
  */
 MochaUtilsStatus Mocha_GetEnvironmentPath(char *environmentPathBuffer, uint32_t bufferLen);
 
-/***
-* Starts the MCP Thread in mocha to allows usage of /dev/iosuhax and wupclient
-* @return MOCHA_RESULT_SUCCESS
-*         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
-*         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
-*         MOCHA_RESULT_UNKNOWN_ERROR: Failed to retrieve the environment path.
+/**
+ * Enables logging via USB (FTDI FT232 chipset only) via OSReport and friends. <br>
+ * @param notSkipExistingLogs If set to true, existing logs of this session won't be skipped.
+ * @return MOCHA_RESULT_SUCCESS: Logging via USB starts or has already been started<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to retrieve the environment path.
  */
-MochaUtilsStatus Mocha_StartUSBLogging(bool avoidLogCatchup);
+MochaUtilsStatus Mocha_StartUSBLogging(bool notSkipExistingLogs);
 
 /**
  * Gives a FSClient full permissions. <br>
