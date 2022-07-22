@@ -51,24 +51,6 @@ MochaUtilsStatus Mocha_CheckAPIVersion(uint32_t *outVersion);
 MochaUtilsStatus Mocha_GetEnvironmentPath(char *environmentPathBuffer, uint32_t bufferLen);
 
 /***
- * Signals Mocha to not redirect the men.rpx to root.rpx anymore
-* @return MOCHA_RESULT_SUCCESS
-*         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
-*         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
-*         MOCHA_RESULT_UNKNOWN_ERROR: Failed to retrieve the environment path.
- */
-MochaUtilsStatus Mocha_RPXHookCompleted();
-
-/***
-* Starts the MCP Thread in mocha to allows usage of /dev/iosuhax and wupclient
-* @return MOCHA_RESULT_SUCCESS
-*         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
-*         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
-*         MOCHA_RESULT_UNKNOWN_ERROR: Failed to retrieve the environment path.
- */
-MochaUtilsStatus Mocha_StartMCPThread();
-
-/***
 * Starts the MCP Thread in mocha to allows usage of /dev/iosuhax and wupclient
 * @return MOCHA_RESULT_SUCCESS
 *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>

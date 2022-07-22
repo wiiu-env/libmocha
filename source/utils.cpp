@@ -80,37 +80,6 @@ MochaUtilsStatus Mocha_GetEnvironmentPath(char *environmentPathBuffer, uint32_t 
     return res;
 }
 
-MochaUtilsStatus Mocha_SimpleCommand(uint32_t command, uint32_t apiVersion) {
-    if (!mochaInitDone) {
-        return MOCHA_RESULT_LIB_UNINITIALIZED;
-    }
-    if (mochaApiVersion < apiVersion) {
-        return MOCHA_RESULT_UNSUPPORTED_COMMAND;
-    }
-    MochaUtilsStatus res = MOCHA_RESULT_UNKNOWN_ERROR;
-    int mcpFd            = IOS_Open("/dev/mcp", (IOSOpenMode) 0);
-    if (mcpFd >= 0) {
-        ALIGN_0x40 uint32_t io_buffer[0x40 / 4];
-        io_buffer[0] = command;
-
-        if (IOS_Ioctl(mcpFd, 100, io_buffer, 4, io_buffer, 0x4) == IOS_ERROR_OK) {
-            res = MOCHA_RESULT_SUCCESS;
-        }
-
-        IOS_Close(mcpFd);
-    }
-
-    return res;
-}
-
-MochaUtilsStatus Mocha_RPXHookCompleted() {
-    return Mocha_SimpleCommand(IPC_CUSTOM_MEN_RPX_HOOK_COMPLETED, 1);
-}
-
-MochaUtilsStatus Mocha_StartMCPThread() {
-    return Mocha_SimpleCommand(IPC_CUSTOM_START_MCP_THREAD, 1);
-}
-
 MochaUtilsStatus Mocha_StartUSBLogging(bool avoidLogCatchup) {
     if (!mochaInitDone) {
         return MOCHA_RESULT_LIB_UNINITIALIZED;
