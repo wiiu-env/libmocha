@@ -212,7 +212,7 @@ MochaUtilsStatus Mocha_ODMGetDiscKey(WUDDiscKey *discKey) {
     return res;
 }
 
-extern int bspRead(const char *, uint32_t, const char *, uint32_t, uint16_t *);
+extern "C" int bspRead(const char *, uint32_t, const char *, uint32_t, uint16_t *);
 MochaUtilsStatus Mocha_SEEPROMRead(uint8_t *out_buffer, uint32_t offset, uint32_t size) {
     if (!mochaInitDone) {
         return MOCHA_RESULT_LIB_UNINITIALIZED;
