@@ -20,6 +20,8 @@ typedef enum MochaUtilsStatus {
     MOCHA_RESULT_UNKNOWN_ERROR           = -0x100,
 } MochaUtilsStatus;
 
+const char *Mocha_GetStatusStr(MochaUtilsStatus status);
+
 /**
  * Initializes the mocha lib. Needs to be called before any other functions can be used
  * @return MOCHA_RESULT_SUCCESS: Library has been successfully initialized <br>

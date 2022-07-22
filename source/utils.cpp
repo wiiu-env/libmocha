@@ -22,6 +22,32 @@ uint32_t mochaApiVersion = 0;
 #define IOCTL_KERN_READ32    0x06
 #define IOCTL_KERN_WRITE32   0x07
 #define IOCTL_READ_OTP       0x08
+
+const char *Mocha_GetStatusStr(MochaUtilsStatus status) {
+    switch (status) {
+        case MOCHA_RESULT_SUCCESS:
+            return "MOCHA_RESULT_SUCCESS";
+        case MOCHA_RESULT_INVALID_ARGUMENT:
+            return "MOCHA_RESULT_INVALID_ARGUMENT";
+        case MOCHA_RESULT_MAX_CLIENT:
+            return "MOCHA_RESULT_MAX_CLIENT";
+        case MOCHA_RESULT_OUT_OF_MEMORY:
+            return "MOCHA_RESULT_OUT_OF_MEMORY";
+        case MOCHA_RESULT_NOT_FOUND:
+            return "MOCHA_RESULT_NOT_FOUND";
+        case MOCHA_RESULT_UNSUPPORTED_API_VERSION:
+            return "MOCHA_RESULT_UNSUPPORTED_API_VERSION";
+        case MOCHA_RESULT_UNSUPPORTED_COMMAND:
+            return "MOCHA_RESULT_UNSUPPORTED_COMMAND";
+        case MOCHA_RESULT_LIB_UNINITIALIZED:
+            return "MOCHA_RESULT_LIB_UNINITIALIZED";
+        case MOCHA_RESULT_UNKNOWN_ERROR:
+            return "MOCHA_RESULT_UNKNOWN_ERROR";
+    }
+    return "MOCHA_RESULT_UNKNOWN_ERROR";
+}
+
+
 MochaUtilsStatus Mocha_InitLibrary() {
     if (mochaInitDone) {
         return MOCHA_RESULT_SUCCESS;
