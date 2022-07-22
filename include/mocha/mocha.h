@@ -39,15 +39,15 @@ MochaUtilsStatus Mocha_DeInitLibrary();
  */
 MochaUtilsStatus Mocha_CheckAPIVersion(uint32_t *outVersion);
 
-/***
+/**
  * Returns the path of the currently loaded environment
  * @param environmentPathBuffer: buffer where the result will be stored
  * @param bufferLen: length of the buffer. Required to be >= 0x100
-* @return MOCHA_RESULT_SUCCESS: The environment path has been stored in environmentPathBuffer<br>
-*         MOCHA_RESULT_INVALID_ARGUMENT: invalid environmentPathBuffer pointer or bufferLen \< 0x100<br>
-*         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
-*         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
-*         MOCHA_RESULT_UNKNOWN_ERROR: Failed to retrieve the environment path.
+ * @return MOCHA_RESULT_SUCCESS: The environment path has been stored in environmentPathBuffer<br>
+ *         MOCHA_RESULT_INVALID_ARGUMENT: invalid environmentPathBuffer pointer or bufferLen \< 0x100<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to retrieve the environment path.
  */
 MochaUtilsStatus Mocha_GetEnvironmentPath(char *environmentPathBuffer, uint32_t bufferLen);
 
@@ -65,11 +65,12 @@ MochaUtilsStatus Mocha_StartUSBLogging(bool notSkipExistingLogs);
  * Gives a FSClient full permissions. <br>
  * Requires Mocha API Version: 1
  * @param client The FSClient that should have full permission
- * @return MOCHA_RESULT_SUCCESS: The has been unlocked successfully.
+ * @return MOCHA_RESULT_SUCCESS: The has been unlocked successfully. <br>
+ *         MOCHA_RESULT_INVALID_ARGUMENT: client was NULL <br>
  *         MOCHA_RESULT_MAX_CLIENT: The maximum number of FS Clients have been unlocked.<br>
  *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
  *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
- *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to retrieve the environment path.
+ *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to unlock a given FSClient
  */
 MochaUtilsStatus Mocha_UnlockFSClient(FSClient *client);
 
@@ -77,11 +78,11 @@ MochaUtilsStatus Mocha_UnlockFSClient(FSClient *client);
  * Gives a /dev/fsa handle full permissions. <br>
  * Requires Mocha API Version: 1
  * @param client The /dev/fsa handle that should have full permission
- * @return MOCHA_RESULT_SUCCESS: The has been unlocked successfully.
+ * @return MOCHA_RESULT_SUCCESS: The has been unlocked successfully. <br>
  *         MOCHA_RESULT_MAX_CLIENT: The maximum number of FS Clients have been unlocked.<br>
  *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
  *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
- *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to retrieve the environment path.
+ *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to unlock the given client
  */
 MochaUtilsStatus Mocha_UnlockFSClientEx(int clientHandle);
 
@@ -104,6 +105,17 @@ typedef struct WUDDiscKey {
  */
 MochaUtilsStatus Mocha_ODMGetDiscKey(WUDDiscKey *discKey);
 
+/**
+ * Reads *size* bytes from *offset* from the SEEPROM of the console. Total size of SEEPROM is 0x200
+ * @param out_buffer buffer where the result will be stored
+ * @param offset offset in bytes. Must be an even number.
+ * @param size size in bytes
+ * @return MOCHA_RESULT_SUCCESS: The SEEPROM has been read into the given buffer.<br>
+ *         MOCHA_RESULT_INVALID_ARGUMENT: The given out_buffer was NULL or the offset was < 0 or an odd value<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to read the seeprom.
+ */
 MochaUtilsStatus Mocha_SEEPROMRead(uint8_t *out_buffer, uint32_t offset, uint32_t size);
 
 #ifdef __cplusplus
