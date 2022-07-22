@@ -1,9 +1,8 @@
 #pragma once
-#include <coreinit/filesystem_fsa.h>
-
 #include "FastLockWrapper.h"
 #include <cerrno>
 #include <climits>
+#include <coreinit/filesystem_fsa.h>
 #include <cstdlib>
 #include <cstring>
 #include <fcntl.h>
