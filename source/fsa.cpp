@@ -104,10 +104,10 @@ FSError FSAEx_RawReadEx(int clientHandle, void *data, uint32_t size_bytes, uint3
     if ((uint32_t) data & 0x3F) {
         auto *alignedBuffer = memalign(0x40, ROUNDUP(size_bytes * cnt, 0x40));
         if (!alignedBuffer) {
-            DEBUG_FUNCTION_LINE_ERR("FSAEx_RawReadEx buffer not aligned (%08X).\n", data);
+            DEBUG_FUNCTION_LINE_ERR("Buffer not aligned (%08X).\n", data);
             return FS_ERROR_INVALID_ALIGNMENT;
         }
-        DEBUG_FUNCTION_LINE_WARN("FSAEx_RawReadEx buffer not aligned (%08X). Align to 0x40 for best performance\n", data);
+        DEBUG_FUNCTION_LINE_WARN("Buffer not aligned (%08X). Align to 0x40 for best performance\n", data);
         tmp = alignedBuffer;
     }
 
@@ -162,10 +162,10 @@ FSError FSAEx_RawWriteEx(int clientHandle, const void *data, uint32_t size_bytes
     if ((uint32_t) data & 0x3F) {
         auto *alignedBuffer = memalign(0x40, ROUNDUP(size_bytes * cnt, 0x40));
         if (!alignedBuffer) {
-            OSReport("## ERROR: FSAEx_RawWriteEx buffer not aligned (%08X).\n", data);
+            DEBUG_FUNCTION_LINE_ERR("Buffer not aligned (%08X).", data);
             return FS_ERROR_INVALID_ALIGNMENT;
         }
-        OSReport("## WARNING: FSAEx_RawWriteEx buffer not aligned (%08X). Align to 0x40 for best performance\n", data);
+        DEBUG_FUNCTION_LINE_WARN("Buffer not aligned (%08X). Align to 0x40 for best performance", data);
         tmp = alignedBuffer;
         memcpy(tmp, data, size_bytes * cnt);
     }
