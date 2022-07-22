@@ -13,6 +13,8 @@ typedef enum MochaUtilsStatus {
     MOCHA_RESULT_INVALID_ARGUMENT        = -0x01,
     MOCHA_RESULT_MAX_CLIENT              = -0x02,
     MOCHA_RESULT_OUT_OF_MEMORY           = -0x03,
+    MOCHA_RESULT_ALREADY_EXISTS          = -0x04,
+    MOCHA_RESULT_ADD_DEVOPTAB_FAILED     = -0x05,
     MOCHA_RESULT_NOT_FOUND               = -0x06,
     MOCHA_RESULT_UNSUPPORTED_API_VERSION = -0x10,
     MOCHA_RESULT_UNSUPPORTED_COMMAND     = -0x11,
@@ -252,6 +254,33 @@ MochaUtilsStatus Mocha_ODMGetDiscKey(WUDDiscKey *discKey);
  *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to read the seeprom.
  */
 MochaUtilsStatus Mocha_SEEPROMRead(uint8_t *out_buffer, uint32_t offset, uint32_t size);
+
+/**
+ * Mounts a device (dev_path) to a given path (mount_path) and make a accessible via the
+ * newlib devoptab (standard POSIX file I/O)
+ *
+ * Requires Mocha API Version: 1
+ * @param virt_name Name which should be used for the devoptab. When choosing e.g. "storage_usb" the mounted device can be accessed via "storage_usb:/".
+ * @param dev_path (optional) Cafe OS internal device path (e.g. /dev/slc01). If the given dev_path is NULL, an existing mount will be used (and is expected)
+ * @param mount_path Path where CafeOS should mount the device to. Must be globally unique and start with "/vol/storage_"
+ * @return MOCHA_RESULT_SUCCESS: The device has been mounted successfully <br>
+ *         MOCHA_RESULT_MAX_CLIENT: The maximum number of FSAClients have been registered.<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to retrieve the environment path.
+ */
+MochaUtilsStatus Mocha_MountFS(const char *virt_name, const char *dev_path, const char *mount_path);
+
+MochaUtilsStatus Mocha_MountFSEx(const char *virt_name, const char *dev_path, const char *mount_path, FSAMountFlags mountFlags, void *mountArgBuf, int mountArgBufLen);
+
+/**
+ * Unmounts a mount by it's name.
+ * @param virt_name Name of the mount.
+ * @return MOCHA_RESULT_SUCCESS: The unmount was successful <br>
+ *         MOCHA_RESULT_INVALID_ARGUMENT: <br>
+ *         MOCHA_RESULT_NOT_FOUND: No mount with the given name has been found.
+ */
+MochaUtilsStatus Mocha_UnmountFS(const char *virt_name);
 
 #ifdef __cplusplus
 } // extern "C"
