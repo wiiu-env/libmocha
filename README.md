@@ -1,5 +1,7 @@
 [![Publish Docker Image](https://github.com/wiiu-env/libmocha/actions/workflows/push_image.yml/badge.svg)](https://github.com/wiiu-env/libmocha/actions/workflows/push_image.yml)
 
+**This library is still WIP, may not work as expected or have breaking changes in the near future**
+
 # libmocha
 Requires the [MochaPayload](https://github.com/wiiu-env/MochaPayload) to be running via [EnvironmentLoader](https://github.com/wiiu-env/EnvironmentLoader).  
 Requires [wut](https://github.com/devkitPro/wut) for building.

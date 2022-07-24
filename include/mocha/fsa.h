@@ -15,7 +15,7 @@ extern "C" {
  * @param outHandle pointer where the handle of the raw device will be stored
  * @return
  */
-FSError FSAEx_RawOpen(FSClient *client, char *device_path, int32_t *outHandle);
+FSError FSAEx_RawOpen(FSClient *client, const char *device_path, int32_t *outHandle);
 
 /**
  * Opens a device for raw read/write
@@ -24,7 +24,7 @@ FSError FSAEx_RawOpen(FSClient *client, char *device_path, int32_t *outHandle);
  * @param outHandle pointer where the handle of the raw device will be stored
  * @return
  */
-FSError FSAEx_RawOpenEx(int clientHandle, char *device_path, int32_t *outHandle);
+FSError FSAEx_RawOpenEx(FSAClientHandle clientHandle, const char *device_path, int32_t *outHandle);
 
 /**
  * Closes a devices that was previously opened via FSAEx_RawOpen
@@ -40,7 +40,7 @@ FSError FSAEx_RawClose(FSClient *client, int32_t device_handle);
  * @param device_handle device handle
  * @return
  */
-FSError FSAEx_RawCloseEx(int clientHandle, int32_t device_handle);
+FSError FSAEx_RawCloseEx(FSAClientHandle clientHandle, int32_t device_handle);
 
 /**
  * Read data from a device handle.
@@ -66,7 +66,7 @@ FSError FSAEx_RawRead(FSClient *client, void *data, uint32_t size_bytes, uint32_
  * @param device_handle valid device handle.
  * @return
  */
-FSError FSAEx_RawReadEx(int clientHandle, void *data, uint32_t size_bytes, uint32_t cnt, uint64_t blocks_offset, int device_handle);
+FSError FSAEx_RawReadEx(FSAClientHandle clientHandle, void *data, uint32_t size_bytes, uint32_t cnt, uint64_t blocks_offset, int device_handle);
 
 
 /**
@@ -93,7 +93,7 @@ FSError FSAEx_RawWrite(FSClient *client, const void *data, uint32_t size_bytes, 
  * @param device_handle valid device handle.
  * @return
  */
-FSError FSAEx_RawWriteEx(int clientHandle, const void *data, uint32_t size_bytes, uint32_t cnt, uint64_t blocks_offset, int device_handle);
+FSError FSAEx_RawWriteEx(FSAClientHandle clientHandle, const void *data, uint32_t size_bytes, uint32_t cnt, uint64_t blocks_offset, int device_handle);
 
 #ifdef __cplusplus
 } // extern "C"

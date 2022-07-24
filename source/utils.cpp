@@ -33,6 +33,10 @@ const char *Mocha_GetStatusStr(MochaUtilsStatus status) {
             return "MOCHA_RESULT_MAX_CLIENT";
         case MOCHA_RESULT_OUT_OF_MEMORY:
             return "MOCHA_RESULT_OUT_OF_MEMORY";
+        case MOCHA_RESULT_ALREADY_EXISTS:
+            return "MOCHA_RESULT_ALREADY_EXISTS";
+        case MOCHA_RESULT_ADD_DEVOPTAB_FAILED:
+            return "MOCHA_RESULT_ADD_DEVOPTAB_FAILED";
         case MOCHA_RESULT_NOT_FOUND:
             return "MOCHA_RESULT_NOT_FOUND";
         case MOCHA_RESULT_UNSUPPORTED_API_VERSION:
