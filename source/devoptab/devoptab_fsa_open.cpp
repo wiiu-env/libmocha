@@ -48,7 +48,7 @@ int __fsa_open(struct _reent *r,
     }
 
     // Open the file
-    FSOpenFileFlags openFlags = (mode & O_UNENCRYPTED) ? FS_OPEN_FLAG_UNENCRYPTED : FS_OPEN_FLAG_NONE;
+    FSOpenFileFlags openFlags = (flags & O_UNENCRYPTED) ? FS_OPEN_FLAG_UNENCRYPTED : FS_OPEN_FLAG_NONE;
 
     auto *deviceData = (FSADeviceData *) r->deviceData;
 
