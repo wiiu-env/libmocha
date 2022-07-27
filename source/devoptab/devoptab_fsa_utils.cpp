@@ -16,8 +16,14 @@ __fsa_fixpath(struct _reent *r,
         p = (char *) path;
     }
 
-    if (strlen(p) > FS_MAX_PATH) {
+    uint32_t sizePath = strlen(p);
+    if (sizePath > FS_MAX_PATH) {
         r->_errno = ENAMETOOLONG;
+        return nullptr;
+    }
+
+    if (sizePath == 0) {
+        r->_errno = ENOENT;
         return nullptr;
     }
 
