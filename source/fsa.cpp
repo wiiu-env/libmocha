@@ -175,7 +175,7 @@ FSError FSAEx_RawWriteEx(int clientHandle, const void *data, uint32_t size_bytes
     shim->ioctlvVec[2].vaddr = &shim->response;
     shim->ioctlvVec[2].len   = sizeof(FSAResponse);
 
-    auto &request         = shim->request.rawRead;
+    auto &request         = shim->request.rawWrite;
     request.blocks_offset = blocks_offset;
     request.count         = cnt;
     request.size          = size_bytes;
