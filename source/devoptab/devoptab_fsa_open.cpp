@@ -69,6 +69,7 @@ int __fsa_open(struct _reent *r,
     file        = (__fsa_file_t *) fileStruct;
     file->fd    = fd;
     file->flags = (flags & (O_ACCMODE | O_APPEND | O_SYNC));
+    file->offset = 0;
     strncpy(file->path, fixedPath, FS_MAX_PATH);
     free(fixedPath);
 
