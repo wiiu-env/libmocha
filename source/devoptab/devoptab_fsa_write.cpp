@@ -61,6 +61,7 @@ ssize_t __fsa_write(struct _reent *r, void *fd, const char *ptr, size_t len) {
             return -1;
         }
 
+        file->offset += status;
         bytesWritten += status;
         ptr += status;
 
