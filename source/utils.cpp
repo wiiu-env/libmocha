@@ -43,6 +43,8 @@ const char *Mocha_GetStatusStr(MochaUtilsStatus status) {
             return "MOCHA_RESULT_UNSUPPORTED_API_VERSION";
         case MOCHA_RESULT_UNSUPPORTED_COMMAND:
             return "MOCHA_RESULT_UNSUPPORTED_COMMAND";
+        case MOCHA_RESULT_UNSUPPORTED_CFW:
+            return "MOCHA_RESULT_UNSUPPORTED_CFW";
         case MOCHA_RESULT_LIB_UNINITIALIZED:
             return "MOCHA_RESULT_LIB_UNINITIALIZED";
         case MOCHA_RESULT_UNKNOWN_ERROR:
@@ -101,11 +103,23 @@ MochaUtilsStatus Mocha_CheckAPIVersion(uint32_t *version) {
         ALIGN_0x40 uint32_t io_buffer[0x40 / 4];
         io_buffer[0] = IPC_CUSTOM_GET_MOCHA_API_VERSION;
 
-        if (IOS_Ioctl(mcpFd, 100, io_buffer, 4, io_buffer, 8) == IOS_ERROR_OK && io_buffer[0] == 0xCAFEBABE) {
-            *version = io_buffer[1];
-            res      = MOCHA_RESULT_SUCCESS;
+        if (IOS_Ioctl(mcpFd, 100, io_buffer, 4, io_buffer, 8) == IOS_ERROR_OK) {
+            // IOCTL_100 hook is available
+            if (io_buffer[0] == 0xCAFEBABE) {
+                // Updated MochaPayload returns magic word
+                *version = io_buffer[1];
+                res      = MOCHA_RESULT_SUCCESS;
+            } else if (io_buffer[0] == 1) {
+                // Old MochaPayload returns success, but zero as magic word
+                res = MOCHA_RESULT_UNSUPPORTED_API_VERSION;
+            } else {
+                // No known implementations are known to trigger this
+                res = MOCHA_RESULT_UNSUPPORTED_CFW;
+            }
         } else {
-            res = MOCHA_RESULT_UNSUPPORTED_API_VERSION;
+            // If IOCTL_100 hook is not available the call returns -1
+            // This is the case with old Mocha CFW or no CFW at all
+            res = MOCHA_RESULT_UNSUPPORTED_CFW;
         }
 
         IOS_Close(mcpFd);
