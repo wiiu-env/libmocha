@@ -19,6 +19,7 @@ typedef enum MochaUtilsStatus {
     MOCHA_RESULT_NOT_FOUND               = -0x06,
     MOCHA_RESULT_UNSUPPORTED_API_VERSION = -0x10,
     MOCHA_RESULT_UNSUPPORTED_COMMAND     = -0x11,
+    MOCHA_RESULT_UNSUPPORTED_CFW         = -0x12,
     MOCHA_RESULT_LIB_UNINITIALIZED       = -0x20,
     MOCHA_RESULT_UNKNOWN_ERROR           = -0x100,
 } MochaUtilsStatus;
@@ -43,9 +44,10 @@ MochaUtilsStatus Mocha_DeinitLibrary();
  *
  * @param outVersion pointer to the variable where the version will be stored.
  *
- * @return MOCHA_RESULT_SUCCESS: The API version has been store in the version ptr<br>
- *         MOCHA_RESULT_INVALID_ARGUMENT: invalid version pointer<br>
- *         MOCHA_RESULT_UNSUPPORTED_API_VERSION: Failed to get the API version caused by an outdated mocha version.
+ * @return MOCHA_RESULT_SUCCESS:                    The API version has been store in the version ptr<br>
+ *         MOCHA_RESULT_INVALID_ARGUMENT:           Invalid version pointer<br>
+ *         MOCHA_RESULT_UNSUPPORTED_API_VERSION:    Failed to get the API version caused by an outdated mocha version.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_CFW:            Failed to get the API version caused by not using a (compatible) CFW.
  */
 MochaUtilsStatus Mocha_CheckAPIVersion(uint32_t *outVersion);
 
