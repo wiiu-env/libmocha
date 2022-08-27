@@ -28,8 +28,8 @@ const char *Mocha_GetStatusStr(MochaUtilsStatus status);
 
 /**
  * Initializes the mocha lib. Needs to be called before any other functions can be used
- * @return MOCHA_RESULT_SUCCESS: Library has been successfully initialized <br>
- *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Failed to initialize the library caused by an outdated mocha version.
+ * @return MOCHA_RESULT_SUCCESS:                Library has been successfully initialized <br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND:    Failed to initialize the library caused by an outdated mocha version.
  */
 MochaUtilsStatus Mocha_InitLibrary();
 
@@ -56,10 +56,10 @@ MochaUtilsStatus Mocha_CheckAPIVersion(uint32_t *outVersion);
  * @param dst - Destination address
  * @param src - Source address
  * @param size - Bytes to copy.
- * @return MOCHA_RESULT_SUCCESS: The data has been copied successfully<br>
- *         MOCHA_RESULT_INVALID_ARGUMENT: invalid version pointer<br>
- *         MOCHA_RESULT_UNKNOWN_ERROR: Unknown error<br>
- *         MOCHA_RESULT_UNSUPPORTED_API_VERSION: Failed to get the API version caused by an outdated mocha version.
+ * @return MOCHA_RESULT_SUCCESS:            The data has been copied successfully<br>
+ *         MOCHA_RESULT_INVALID_ARGUMENT:   Invalid dst or src pointer<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:  Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR:      Unknown error
  */
 MochaUtilsStatus Mocha_IOSUKernelMemcpy(uint32_t dst, uint32_t src, uint32_t size);
 
@@ -68,10 +68,11 @@ MochaUtilsStatus Mocha_IOSUKernelMemcpy(uint32_t dst, uint32_t src, uint32_t siz
  * @param address - Address where the data will be written to.
  * @param buffer - Pointer to the data which should be written.
  * @param size - Bytes to write.
- * @return MOCHA_RESULT_SUCCESS: The data has been written successfully<br>
- *         MOCHA_RESULT_INVALID_ARGUMENT: invalid version pointer<br>
- *         MOCHA_RESULT_UNKNOWN_ERROR: Unknown error<br>
- *         MOCHA_RESULT_UNSUPPORTED_API_VERSION: Failed to get the API version caused by an outdated mocha version.
+ * @return MOCHA_RESULT_SUCCESS:            The data has been written successfully<br>
+ *         MOCHA_RESULT_INVALID_ARGUMENT:   Invalid address or buffer pointer<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:  Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_OUT_OF_MEMORY:      Not enough memory <br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR:      Unknown error
  */
 MochaUtilsStatus Mocha_IOSUKernelWrite(uint32_t address, const uint8_t *buffer, uint32_t size);
 
@@ -81,9 +82,9 @@ MochaUtilsStatus Mocha_IOSUKernelWrite(uint32_t address, const uint8_t *buffer, 
  * @param buffer - Pointer to the buffer where the read will be stored
  * @param size - Bytes to read.
  * @return MOCHA_RESULT_SUCCESS: The data has been read successfully<br>
- *         MOCHA_RESULT_INVALID_ARGUMENT: invalid version pointer<br>
- *         MOCHA_RESULT_UNKNOWN_ERROR: Unknown error<br>
- *         MOCHA_RESULT_UNSUPPORTED_API_VERSION: Failed to get the API version caused by an outdated mocha version.
+ *         MOCHA_RESULT_INVALID_ARGUMENT:   Invalid source address<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:  Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR:      Unknown error
  */
 MochaUtilsStatus Mocha_IOSUKernelRead(uint32_t address, uint8_t *out_buffer, uint32_t size);
 
@@ -92,9 +93,10 @@ MochaUtilsStatus Mocha_IOSUKernelRead(uint32_t address, uint8_t *out_buffer, uin
  * @param address Address where the value will be written.
  * @param value Value that will be written to address.
  * @return MOCHA_RESULT_SUCCESS: The data has been written successfully<br>
- *         MOCHA_RESULT_INVALID_ARGUMENT: invalid version pointer<br>
- *         MOCHA_RESULT_UNKNOWN_ERROR: Unknown error<br>
- *         MOCHA_RESULT_UNSUPPORTED_API_VERSION: Failed to get the API version caused by an outdated mocha version.
+ *         MOCHA_RESULT_INVALID_ARGUMENT:   Invalid target address<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:  Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_OUT_OF_MEMORY:      Not enough memory <br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR:      Unknown error
  */
 MochaUtilsStatus Mocha_IOSUKernelWrite32(uint32_t address, uint32_t value);
 
@@ -103,9 +105,9 @@ MochaUtilsStatus Mocha_IOSUKernelWrite32(uint32_t address, uint32_t value);
  * @param address Address from which the data will be read.
  * @param out_buffer Pointer where the result will be stored
  * @return MOCHA_RESULT_SUCCESS: The data has been read successfully<br>
- *         MOCHA_RESULT_INVALID_ARGUMENT: invalid version pointer<br>
- *         MOCHA_RESULT_UNKNOWN_ERROR: Unknown error<br>
- *         MOCHA_RESULT_UNSUPPORTED_API_VERSION: Failed to get the API version caused by an outdated mocha version.
+ *         MOCHA_RESULT_INVALID_ARGUMENT:   Invalid target address<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:  Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR:      Unknown error
  */
 MochaUtilsStatus Mocha_IOSUKernelRead32(uint32_t address, uint32_t *out_buffer);
 
@@ -114,9 +116,9 @@ MochaUtilsStatus Mocha_IOSUKernelRead32(uint32_t address, uint32_t *out_buffer);
  *
  * @param out_buffer Buffer where the result will be stored.
  * @return MOCHA_RESULT_SUCCESS: The OTP has been read into the buffer<br>
- *         MOCHA_RESULT_INVALID_ARGUMENT: invalid environmentPathBuffer pointer or bufferLen \< 0x100<br>
- *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
- *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to retrieve the environment path.
+ *         MOCHA_RESULT_INVALID_ARGUMENT:   Invalid environmentPathBuffer pointer or bufferLen \< 0x100<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:  Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR:      Failed to retrieve the environment path.
  */
 MochaUtilsStatus Mocha_ReadOTP(WiiUConsoleOTP *out_buffer);
 
@@ -126,8 +128,8 @@ MochaUtilsStatus Mocha_ReadOTP(WiiUConsoleOTP *out_buffer);
  * @param args array of argument with the length arg_cnt
  * @param arg_cnt number of arguments
  * @param outResult
- * @return MOCHA_RESULT_SUCCESS: The SVC has been called successfully, the result has been stored in outResult.<br>
- *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ * @return MOCHA_RESULT_SUCCESS:            The SVC has been called successfully, the result has been stored in outResult.<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:  Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
  *         MOCHA_RESULT_UNKNOWN_ERROR
  */
 int Mocha_IOSUCallSVC(uint32_t svc_id, uint32_t *args, uint32_t arg_cnt, int32_t *outResult);
@@ -137,20 +139,20 @@ int Mocha_IOSUCallSVC(uint32_t svc_id, uint32_t *args, uint32_t arg_cnt, int32_t
  * @param environmentPathBuffer: buffer where the result will be stored
  * @param bufferLen: length of the buffer. Required to be >= 0x100
  * @return MOCHA_RESULT_SUCCESS: The environment path has been stored in environmentPathBuffer<br>
- *         MOCHA_RESULT_INVALID_ARGUMENT: invalid environmentPathBuffer pointer or bufferLen \< 0x100<br>
- *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
- *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
- *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to retrieve the environment path.
+ *         MOCHA_RESULT_INVALID_ARGUMENT:       Invalid environmentPathBuffer pointer or bufferLen \< 0x100<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:      Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND:    Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR:          Failed to retrieve the environment path.
  */
 MochaUtilsStatus Mocha_GetEnvironmentPath(char *environmentPathBuffer, uint32_t bufferLen);
 
 /**
  * Enables logging via USB (FTDI FT232 chipset only) via OSReport and friends. <br>
  * @param notSkipExistingLogs If set to true, existing logs of this session won't be skipped.
- * @return MOCHA_RESULT_SUCCESS: Logging via USB starts or has already been started<br>
- *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
- *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
- *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to retrieve the environment path.
+ * @return MOCHA_RESULT_SUCCESS:                Logging via USB starts or has already been started<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:      Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND:    Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR:          Failed to retrieve the environment path.
  */
 MochaUtilsStatus Mocha_StartUSBLogging(bool notSkipExistingLogs);
 
@@ -158,12 +160,12 @@ MochaUtilsStatus Mocha_StartUSBLogging(bool notSkipExistingLogs);
  * Gives a FSClient full permissions. <br>
  * Requires Mocha API Version: 1
  * @param client The FSClient that should have full permission
- * @return MOCHA_RESULT_SUCCESS: The has been unlocked successfully. <br>
- *         MOCHA_RESULT_INVALID_ARGUMENT: client was NULL <br>
- *         MOCHA_RESULT_MAX_CLIENT: The maximum number of FS Clients have been unlocked.<br>
- *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
- *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
- *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to unlock a given FSClient
+ * @return MOCHA_RESULT_SUCCESS:                The has been unlocked successfully. <br>
+ *         MOCHA_RESULT_INVALID_ARGUMENT:       Client was NULL <br>
+ *         MOCHA_RESULT_MAX_CLIENT:             The maximum number of FS Clients have been unlocked.<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:      Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND:    Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR:          Failed to unlock a given FSClient
  */
 MochaUtilsStatus Mocha_UnlockFSClient(FSClient *client);
 
@@ -171,11 +173,11 @@ MochaUtilsStatus Mocha_UnlockFSClient(FSClient *client);
  * Gives a /dev/fsa handle full permissions. <br>
  * Requires Mocha API Version: 1
  * @param client The /dev/fsa handle that should have full permission
- * @return MOCHA_RESULT_SUCCESS: The has been unlocked successfully. <br>
- *         MOCHA_RESULT_MAX_CLIENT: The maximum number of FS Clients have been unlocked.<br>
- *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
- *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
- *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to unlock the given client
+ * @return MOCHA_RESULT_SUCCESS:                The has been unlocked successfully. <br>
+ *         MOCHA_RESULT_MAX_CLIENT:             The maximum number of FS Clients have been unlocked.<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:      Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND:    Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR:          Failed to unlock the given client
  */
 MochaUtilsStatus Mocha_UnlockFSClientEx(int clientHandle);
 
@@ -192,11 +194,11 @@ MochaUtilsStatus Mocha_UnlockFSClientEx(int clientHandle);
  * To launch the prepared RPX call Mocha_LaunchHomebrewWrapper if this call was successful.
  *
  * @param loadInfo Information about the .rpx replacement.
- * @return MOCHA_RESULT_SUCCESS: Loading the next RPX will be redirected. <br>
- *         MOCHA_RESULT_INVALID_ARGUMENT: The given loadInfo was NULL <br>
- *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
- *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
- *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to setup a redirect of RPX.
+ * @return MOCHA_RESULT_SUCCESS:                Loading the next RPX will be redirected. <br>
+ *         MOCHA_RESULT_INVALID_ARGUMENT:       The given loadInfo was NULL <br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:      Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND:    Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR:          Failed to setup a redirect of RPX.
  */
 MochaUtilsStatus Mocha_PrepareRPXLaunch(MochaRPXLoadInfo *loadInfo);
 
@@ -207,9 +209,9 @@ MochaUtilsStatus Mocha_PrepareRPXLaunch(MochaRPXLoadInfo *loadInfo);
  * see: `Mocha_LaunchRPX` to prepare and launch a RPX in one command.
  *
  * @return MOCHA_RESULT_SUCCESS: App is launching<br>
- *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
- *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
- *         MOCHA_RESULT_NOT_FOUND: Not application that can be used as homebrew wrapper found.
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:      Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND:    Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_NOT_FOUND:              Not application that can be used as homebrew wrapper found.
  */
 MochaUtilsStatus Mocha_LaunchHomebrewWrapper();
 
@@ -220,11 +222,11 @@ MochaUtilsStatus Mocha_LaunchHomebrewWrapper();
  * Note: Combines Mocha_PrepareRPXLaunch and Mocha_LaunchHomebrewWrapper.
  * @param loadInfo
  * @return MOCHA_RESULT_SUCCESS: Requested RPX will be launched<br>
- *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
- *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
- *         MOCHA_RESULT_INVALID_ARGUMENT: The given loadInfo was NULL <br>
- *         MOCHA_RESULT_NOT_FOUND: Not application that can be used as homebrew wrapper found.
- *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to setup a redirect of RPX.
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:      Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND:    Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_INVALID_ARGUMENT:       The given loadInfo was NULL <br>
+ *         MOCHA_RESULT_NOT_FOUND:              Not application that can be used as homebrew wrapper found.
+ *         MOCHA_RESULT_UNKNOWN_ERROR:          Failed to setup a redirect of RPX.
  */
 MochaUtilsStatus Mocha_LaunchRPX(MochaRPXLoadInfo *loadInfo);
 
@@ -237,11 +239,11 @@ typedef struct WUDDiscKey {
  *
  * @param discKey target buffer where the result will be stored.
  * @return MOCHA_RESULT_SUCCESS: The disc key of the inserted disc has been read into the given buffer.<br>
- *         MOCHA_RESULT_INVALID_ARGUMENT: The given discKey buffer was NULL <br>
- *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
- *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
- *         MOCHA_RESULT_NOT_FOUND: Failed to obtain disc key, no disc inserted?.
- *         MOCHA_RESULT_UNKNOWN_ERROR: Unknown error.
+ *         MOCHA_RESULT_INVALID_ARGUMENT:       The given discKey buffer was NULL <br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:      Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND:    Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_NOT_FOUND:              Failed to obtain disc key, no disc inserted?.
+ *         MOCHA_RESULT_UNKNOWN_ERROR:          Unknown error.
  */
 MochaUtilsStatus Mocha_ODMGetDiscKey(WUDDiscKey *discKey);
 
@@ -250,11 +252,11 @@ MochaUtilsStatus Mocha_ODMGetDiscKey(WUDDiscKey *discKey);
  * @param out_buffer buffer where the result will be stored
  * @param offset offset in bytes. Must be an even number.
  * @param size size in bytes
- * @return MOCHA_RESULT_SUCCESS: The SEEPROM has been read into the given buffer.<br>
- *         MOCHA_RESULT_INVALID_ARGUMENT: The given out_buffer was NULL or the offset was < 0 or an odd value<br>
- *         MOCHA_RESULT_LIB_UNINITIALIZED: Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
- *         MOCHA_RESULT_UNSUPPORTED_COMMAND: Command not supported by the currently loaded mocha version.<br>
- *         MOCHA_RESULT_UNKNOWN_ERROR: Failed to read the seeprom.
+ * @return MOCHA_RESULT_SUCCESS:                The SEEPROM has been read into the given buffer.<br>
+ *         MOCHA_RESULT_INVALID_ARGUMENT:       The given out_buffer was NULL or the offset was < 0 or an odd value<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:      Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND:    Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR:          Failed to read the seeprom.
  */
 MochaUtilsStatus Mocha_SEEPROMRead(uint8_t *out_buffer, uint32_t offset, uint32_t size);
 
