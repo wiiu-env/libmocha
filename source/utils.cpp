@@ -150,7 +150,7 @@ MochaUtilsStatus Mocha_IOSUKernelMemcpy(uint32_t dst, uint32_t src, uint32_t siz
     return res >= 0 ? MOCHA_RESULT_SUCCESS : MOCHA_RESULT_UNKNOWN_ERROR;
 }
 
-MochaUtilsStatus Mocha_IOSUKernelWrite(uint32_t address, const uint8_t *buffer, uint32_t size) {
+MochaUtilsStatus Mocha_IOSUMemoryWrite(uint32_t address, const uint8_t *buffer, uint32_t size) {
     if (size == 0) {
         return MOCHA_RESULT_SUCCESS;
     }
@@ -175,7 +175,7 @@ MochaUtilsStatus Mocha_IOSUKernelWrite(uint32_t address, const uint8_t *buffer, 
     return res >= 0 ? MOCHA_RESULT_SUCCESS : MOCHA_RESULT_UNKNOWN_ERROR;
 }
 
-MochaUtilsStatus Mocha_IOSUKernelRead(uint32_t address, uint8_t *out_buffer, uint32_t size) {
+MochaUtilsStatus Mocha_IOSUMemoryRead(uint32_t address, uint8_t *out_buffer, uint32_t size) {
     if (size == 0) {
         return MOCHA_RESULT_SUCCESS;
     }
@@ -209,11 +209,50 @@ MochaUtilsStatus Mocha_IOSUKernelRead(uint32_t address, uint8_t *out_buffer, uin
 }
 
 MochaUtilsStatus Mocha_IOSUKernelWrite32(uint32_t address, uint32_t value) {
-    return Mocha_IOSUKernelWrite(address, reinterpret_cast<const uint8_t *>(&value), 4);
+    if (address == 0) {
+        return MOCHA_RESULT_INVALID_ARGUMENT;
+    }
+    if (!mochaInitDone || iosuhaxHandle < 0) {
+        return MOCHA_RESULT_LIB_UNINITIALIZED;
+    }
+
+    ALIGN_0x40 uint32_t io_buf[0x40 >> 2];
+    io_buf[0] = address;
+    io_buf[1] = value;
+
+    auto res = IOS_Ioctl(iosuhaxHandle, IOCTL_KERN_WRITE32, io_buf, 2 * sizeof(uint32_t), 0, 0);
+    return res >= 0 ? MOCHA_RESULT_SUCCESS : MOCHA_RESULT_UNKNOWN_ERROR;
 }
 
 MochaUtilsStatus Mocha_IOSUKernelRead32(uint32_t address, uint32_t *out_buffer) {
-    return Mocha_IOSUKernelRead(address, reinterpret_cast<uint8_t *>(out_buffer), 4);
+    if (address == 0 || out_buffer == nullptr) {
+        return MOCHA_RESULT_INVALID_ARGUMENT;
+    }
+    if (!mochaInitDone || iosuhaxHandle < 0) {
+        return MOCHA_RESULT_LIB_UNINITIALIZED;
+    }
+
+    ALIGN_0x40 uint32_t io_buf[0x40 >> 2];
+    io_buf[0] = address;
+
+    void *tmp_buf = NULL;
+    int32_t count = 1;
+
+    if (((uintptr_t) out_buffer & 0x3F) || ((count * 4) & 0x3F)) {
+        tmp_buf = (uint32_t *) memalign(0x40, ROUNDUP((count * 4), 0x40));
+        if (!tmp_buf) {
+            return MOCHA_RESULT_OUT_OF_MEMORY;
+        }
+    }
+
+    int res = IOS_Ioctl(iosuhaxHandle, IOCTL_KERN_READ32, io_buf, sizeof(address), tmp_buf ? tmp_buf : out_buffer, count * 4);
+
+    if (res >= 0 && tmp_buf) {
+        memcpy(out_buffer, tmp_buf, count * 4);
+    }
+
+    free(tmp_buf);
+    return res >= 0 ? MOCHA_RESULT_SUCCESS : MOCHA_RESULT_UNKNOWN_ERROR;
 }
 
 MochaUtilsStatus Mocha_ReadOTP(WiiUConsoleOTP *out_buffer) {
