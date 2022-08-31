@@ -52,7 +52,7 @@ MochaUtilsStatus Mocha_DeinitLibrary();
 MochaUtilsStatus Mocha_CheckAPIVersion(uint32_t *outVersion);
 
 /**
- * Copies data within IOSU with kernel permission.
+ * Copies data within IOSU with MCP permission.
  * @param dst - Destination address
  * @param src - Source address
  * @param size - Bytes to copy.
@@ -61,10 +61,10 @@ MochaUtilsStatus Mocha_CheckAPIVersion(uint32_t *outVersion);
  *         MOCHA_RESULT_LIB_UNINITIALIZED:  Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
  *         MOCHA_RESULT_UNKNOWN_ERROR:      Unknown error
  */
-MochaUtilsStatus Mocha_IOSUKernelMemcpy(uint32_t dst, uint32_t src, uint32_t size);
+MochaUtilsStatus Mocha_IOSUMemoryMemcpy(uint32_t dst, uint32_t src, uint32_t size);
 
 /**
- * Writes data to a given address with kernel permission.
+ * Writes data to a given address with MCP permission.
  * @param address - Address where the data will be written to.
  * @param buffer - Pointer to the data which should be written.
  * @param size - Bytes to write.
@@ -74,10 +74,10 @@ MochaUtilsStatus Mocha_IOSUKernelMemcpy(uint32_t dst, uint32_t src, uint32_t siz
  *         MOCHA_RESULT_OUT_OF_MEMORY:      Not enough memory <br>
  *         MOCHA_RESULT_UNKNOWN_ERROR:      Unknown error
  */
-MochaUtilsStatus Mocha_IOSUKernelWrite(uint32_t address, const uint8_t *buffer, uint32_t size);
+MochaUtilsStatus Mocha_IOSUMemoryWrite(uint32_t address, const uint8_t *buffer, uint32_t size);
 
 /**
- * Reads data from a given address with kernel permission.
+ * Reads data from a given address with MCP permission.
  * @param address - Address where the data will be read from.
  * @param buffer - Pointer to the buffer where the read will be stored
  * @param size - Bytes to read.
@@ -86,10 +86,10 @@ MochaUtilsStatus Mocha_IOSUKernelWrite(uint32_t address, const uint8_t *buffer, 
  *         MOCHA_RESULT_LIB_UNINITIALIZED:  Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
  *         MOCHA_RESULT_UNKNOWN_ERROR:      Unknown error
  */
-MochaUtilsStatus Mocha_IOSUKernelRead(uint32_t address, uint8_t *out_buffer, uint32_t size);
+MochaUtilsStatus Mocha_IOSUMemoryRead(uint32_t address, uint8_t *out_buffer, uint32_t size);
 
 /**
- * Write 4 bytes with IOSU kernel permission
+ * Writes 4 bytes with IOSU kernel permission
  * @param address Address where the value will be written.
  * @param value Value that will be written to address.
  * @return MOCHA_RESULT_SUCCESS: The data has been written successfully<br>
@@ -112,7 +112,7 @@ MochaUtilsStatus Mocha_IOSUKernelWrite32(uint32_t address, uint32_t value);
 MochaUtilsStatus Mocha_IOSUKernelRead32(uint32_t address, uint32_t *out_buffer);
 
 /**
- * Read the consoles OTP into the given buffer.
+ * Reads the consoles OTP into the given buffer.
  *
  * @param out_buffer Buffer where the result will be stored.
  * @return MOCHA_RESULT_SUCCESS: The OTP has been read into the buffer<br>
