@@ -82,7 +82,7 @@ MochaUtilsStatus Mocha_InitLibrary() {
     return MOCHA_RESULT_SUCCESS;
 }
 
-MochaUtilsStatus Mocha_DeinitLibrary() {
+MochaUtilsStatus Mocha_DeInitLibrary() {
     mochaInitDone   = 0;
     mochaApiVersion = 0;
 
