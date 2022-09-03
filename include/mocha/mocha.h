@@ -37,7 +37,7 @@ MochaUtilsStatus Mocha_InitLibrary();
  * Deinitializes the mocha lib
  * @return
  */
-MochaUtilsStatus Mocha_DeinitLibrary();
+MochaUtilsStatus Mocha_DeInitLibrary();
 
 /**
  * Retrieves the API Version of the running mocha.
