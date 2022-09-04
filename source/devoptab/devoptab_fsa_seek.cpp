@@ -15,8 +15,7 @@ off_t __fsa_seek(struct _reent *r,
         return -1;
     }
 
-    auto *file = (__fsa_file_t *) fd;
-
+    auto *file       = (__fsa_file_t *) fd;
     auto *deviceData = (FSADeviceData *) r->deviceData;
 
     std::lock_guard<MutexWrapper> lock(file->mutex);

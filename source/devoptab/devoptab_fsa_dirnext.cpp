@@ -13,12 +13,11 @@ int __fsa_dirnext(struct _reent *r,
         return -1;
     }
 
-    auto *dir = (__fsa_dir_t *) (dirState->dirStruct);
-    memset(&dir->entry_data, 0, sizeof(dir->entry_data));
-
     auto *deviceData = (FSADeviceData *) r->deviceData;
+    auto *dir        = (__fsa_dir_t *) (dirState->dirStruct);
 
     std::lock_guard<MutexWrapper> lock(dir->mutex);
+    memset(&dir->entry_data, 0, sizeof(dir->entry_data));
 
     status = FSAReadDir(deviceData->clientHandle, dir->fd, &dir->entry_data);
     if (status < 0) {
