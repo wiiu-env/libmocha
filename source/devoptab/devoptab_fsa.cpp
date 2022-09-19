@@ -111,7 +111,8 @@ MochaUtilsStatus Mocha_UnmountFS(const char *virt_name) {
             continue;
         }
         if (strcmp(mount->name, virt_name) == 0) {
-            RemoveDevice(mount->name);
+            std::string removeName = std::string(mount->name).append(":");
+            RemoveDevice(removeName.c_str());
             fsa_free(mount);
             return MOCHA_RESULT_SUCCESS;
         }
