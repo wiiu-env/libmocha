@@ -31,7 +31,8 @@ int __fsa_dirnext(struct _reent *r,
 
     __fsa_translate_stat(&dir->entry_data.info, filestat);
 
-    memset(filename, 0, NAME_MAX);
-    strncpy(filename, dir->entry_data.name, NAME_MAX - 1);
+    if (snprintf(filename, NAME_MAX, "%s", dir->entry_data.name) >= NAME_MAX) {
+        DEBUG_FUNCTION_LINE_ERR("snprintf filename result was truncated\n");
+    }
     return 0;
 }
