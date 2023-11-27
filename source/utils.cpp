@@ -88,6 +88,7 @@ MochaUtilsStatus Mocha_DeInitLibrary() {
 
     if (iosuhaxHandle >= 0) {
         IOS_Close(iosuhaxHandle);
+        iosuhaxHandle = -1;
     }
 
     return MOCHA_RESULT_SUCCESS;
