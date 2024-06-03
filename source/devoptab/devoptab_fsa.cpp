@@ -4,6 +4,7 @@
 #include <coreinit/cache.h>
 #include <coreinit/filesystem_fsa.h>
 #include <mutex>
+#include <string>
 
 static const devoptab_t fsa_default_devoptab = {
         .structSize   = sizeof(__fsa_file_t),
