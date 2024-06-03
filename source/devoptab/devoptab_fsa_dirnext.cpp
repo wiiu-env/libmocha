@@ -1,5 +1,6 @@
 #include "devoptab_fsa.h"
 #include "logger.h"
+#include <cstdio>
 #include <mutex>
 
 int __fsa_dirnext(struct _reent *r,
