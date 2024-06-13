@@ -190,22 +190,24 @@ MochaUtilsStatus Mocha_IOSUMemoryRead(uint32_t address, uint8_t *out_buffer, uin
     ALIGN_0x40 uint32_t io_buf[0x40 >> 2];
     io_buf[0] = address;
 
-    void *tmp_buf = nullptr;
+    void *tmp_buf = out_buffer;
 
     if (((uintptr_t) out_buffer & 0x3F) || (size & 0x3F)) {
-        tmp_buf = (uint32_t *) memalign(0x40, ROUNDUP(size, 0x40));
+        tmp_buf = memalign(0x40, ROUNDUP(size, 0x40));
         if (!tmp_buf) {
             return MOCHA_RESULT_OUT_OF_MEMORY;
         }
     }
 
-    int res = IOS_Ioctl(iosuhaxHandle, IOCTL_MEM_READ, io_buf, sizeof(address), tmp_buf ? tmp_buf : out_buffer, size);
+    int res = IOS_Ioctl(iosuhaxHandle, IOCTL_MEM_READ, io_buf, sizeof(address), tmp_buf, size);
 
-    if (res >= 0 && tmp_buf) {
-        memcpy(out_buffer, tmp_buf, size);
+    if (tmp_buf != out_buffer) {
+        if (res >= 0) {
+            memcpy(out_buffer, tmp_buf, size);
+        }
+        free(tmp_buf);
     }
 
-    free(tmp_buf);
     return res >= 0 ? MOCHA_RESULT_SUCCESS : MOCHA_RESULT_UNKNOWN_ERROR;
 }
 
@@ -236,23 +238,25 @@ MochaUtilsStatus Mocha_IOSUKernelRead32(uint32_t address, uint32_t *out_buffer) 
     ALIGN_0x40 uint32_t io_buf[0x40 >> 2];
     io_buf[0] = address;
 
-    void *tmp_buf = NULL;
+    void *tmp_buf = out_buffer;
     int32_t count = 1;
 
     if (((uintptr_t) out_buffer & 0x3F) || ((count * 4) & 0x3F)) {
-        tmp_buf = (uint32_t *) memalign(0x40, ROUNDUP((count * 4), 0x40));
+        tmp_buf = memalign(0x40, ROUNDUP((count * 4), 0x40));
         if (!tmp_buf) {
             return MOCHA_RESULT_OUT_OF_MEMORY;
         }
     }
 
-    int res = IOS_Ioctl(iosuhaxHandle, IOCTL_KERN_READ32, io_buf, sizeof(address), tmp_buf ? tmp_buf : out_buffer, count * 4);
+    int res = IOS_Ioctl(iosuhaxHandle, IOCTL_KERN_READ32, io_buf, sizeof(address), tmp_buf, count * 4);
 
-    if (res >= 0 && tmp_buf) {
-        memcpy(out_buffer, tmp_buf, count * 4);
+    if (tmp_buf != out_buffer) {
+        if (res >= 0) {
+            memcpy(out_buffer, tmp_buf, count * 4);
+        }
+        free(tmp_buf);
     }
 
-    free(tmp_buf);
     return res >= 0 ? MOCHA_RESULT_SUCCESS : MOCHA_RESULT_UNKNOWN_ERROR;
 }
 
