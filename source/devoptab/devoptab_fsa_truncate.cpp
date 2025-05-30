@@ -21,7 +21,7 @@ int __fsa_ftruncate(struct _reent *r,
     // Set the new file size
     status = FSASetPosFile(deviceData->clientHandle, file->fd, len);
     if (status < 0) {
-        DEBUG_FUNCTION_LINE_ERR("FSASetPosFile(0x%08X, 0x%08X, 0x%08X) failed: %s",
+        DEBUG_FUNCTION_LINE_ERR("FSASetPosFile(0x%08X, 0x%08X, 0x%08llX) failed: %s",
                                 deviceData->clientHandle, file->fd, len, FSAGetStatusStr(status));
         r->_errno = __fsa_translate_error(status);
         return -1;

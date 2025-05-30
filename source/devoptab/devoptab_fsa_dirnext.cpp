@@ -23,7 +23,7 @@ int __fsa_dirnext(struct _reent *r,
     status = FSAReadDir(deviceData->clientHandle, dir->fd, &dir->entry_data);
     if (status < 0) {
         if (status != FS_ERROR_END_OF_DIR) {
-            DEBUG_FUNCTION_LINE_ERR("FSAReadDir(0x%08X, 0x%08X, 0x%08X) (%s) failed: %s",
+            DEBUG_FUNCTION_LINE_ERR("FSAReadDir(0x%08X, 0x%08X, %p) (%s) failed: %s",
                                     deviceData->clientHandle, dir->fd, &dir->entry_data, dir->name, FSAGetStatusStr(status));
         }
         r->_errno = __fsa_translate_error(status);

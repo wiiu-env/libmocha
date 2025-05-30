@@ -52,7 +52,7 @@ ssize_t __fsa_read(struct _reent *r, void *fd, char *ptr, size_t len) {
         status = FSAReadFile(deviceData->clientHandle, tmp, 1, size, file->fd, 0);
 
         if (status < 0) {
-            DEBUG_FUNCTION_LINE_ERR("FSAReadFile(0x%08X, 0x%08X, 1, 0x%08X, 0x%08X, 0) (%s) failed: %s",
+            DEBUG_FUNCTION_LINE_ERR("FSAReadFile(0x%08X, %p, 1, 0x%08X, 0x%08X, 0) (%s) failed: %s",
                                     deviceData->clientHandle, tmp, size, file->fd, file->fullPath, FSAGetStatusStr(status));
             if (bytesRead != 0) {
                 return bytesRead; // error after partial read
