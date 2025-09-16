@@ -1,14 +1,90 @@
+#include "../logger.h"
 #include "devoptab_fsa.h"
+
+#include <cstdio>
+
+#define COMP_MAX      50
+
+#define ispathsep(ch) ((ch) == '/' || (ch) == '\\')
+#define iseos(ch)     ((ch) == '\0')
+#define ispathend(ch) (ispathsep(ch) || iseos(ch))
+
+// https://gist.github.com/starwing/2761647
+static char *
+__fsa_normpath(char *out, const char *in) {
+    char *pos[COMP_MAX], **top = pos, *head = out;
+    int isabs = ispathsep(*in);
+
+    if (isabs) *out++ = '/';
+    *top++ = out;
+
+    while (!iseos(*in)) {
+        while (ispathsep(*in)) {
+            ++in;
+        }
+
+        if (iseos(*in)) {
+            break;
+        }
+
+        if (memcmp(in, ".", 1) == 0 && ispathend(in[1])) {
+            ++in;
+            continue;
+        }
+
+        if (memcmp(in, "..", 2) == 0 && ispathend(in[2])) {
+            in += 2;
+            if (top != pos + 1) {
+                out = *--top;
+            } else if (isabs) {
+                out = top[-1];
+            } else {
+                strcpy(out, "../");
+                out += 3;
+            }
+            continue;
+        }
+
+        if (top - pos >= COMP_MAX) {
+            return NULL; // path to complicate
+        }
+
+        *top++ = out;
+        while (!ispathend(*in)) {
+            *out++ = *in++;
+        }
+        if (ispathsep(*in)) {
+            *out++ = '/';
+        }
+    }
+
+    *out = '\0';
+    if (*head == '\0') {
+        strcpy(head, "./");
+    }
+    return head;
+}
+
+uint32_t
+__fsa_hashstring(const char *str) {
+    uint32_t h;
+    uint8_t *p;
+
+    h = 0;
+    for (p = (uint8_t *) str; *p != '\0'; p++) {
+        h = 37 * h + *p;
+    }
+    return h;
+}
 
 char *
 __fsa_fixpath(struct _reent *r,
               const char *path) {
     char *p;
-    char *fixedPath;
 
     if (!path) {
         r->_errno = EINVAL;
-        return nullptr;
+        return NULL;
     }
 
     p = strchr(path, ':') + 1;
@@ -16,63 +92,95 @@ __fsa_fixpath(struct _reent *r,
         p = (char *) path;
     }
 
-    size_t pathLength = strlen(p);
-    if (pathLength > FS_MAX_PATH) {
-        r->_errno = ENAMETOOLONG;
-        return nullptr;
-    }
-
     // wii u softlocks on empty strings so give expected error back
-    if (pathLength == 0) {
+    if (strlen(p) == 0) {
         r->_errno = ENOENT;
-        return nullptr;
+        return NULL;
     }
 
-    fixedPath = static_cast<char *>(memalign(0x40, FS_MAX_PATH + 1));
+    int maxPathLength = PATH_MAX;
+    auto fixedPath    = static_cast<char *>(memalign(0x40, maxPathLength));
     if (!fixedPath) {
+        DEBUG_FUNCTION_LINE_ERR("__fsa_fixpath: failed to allocate memory for fixedPath");
         r->_errno = ENOMEM;
-        return nullptr;
+        return NULL;
     }
 
-    if (p[0] == '/') {
-        auto *deviceData = (FSADeviceData *) r->deviceData;
-        strcpy(fixedPath, deviceData->mount_path);
-        strcat(fixedPath, p);
+    // Convert to an absolute path
+    if (p[0] != '\0' && p[0] != '\\' && p[0] != '/') {
+        __fsa_device_t *deviceData = (__fsa_device_t *) r->deviceData;
+        if (snprintf(fixedPath, maxPathLength, "%s/%s", deviceData->cwd, p) >= maxPathLength) {
+            DEBUG_FUNCTION_LINE_ERR("__fsa_fixpath: fixedPath snprintf result (relative) was truncated");
+        }
     } else {
-        strcpy(fixedPath, p);
+        const auto deviceData = static_cast<__fsa_device_t *>(r->deviceData);
+        if (snprintf(fixedPath, maxPathLength, "%s%s", deviceData->mountPath, p) >= maxPathLength) {
+            DEBUG_FUNCTION_LINE_ERR("__fsa_fixpath: fixedPath snprintf result (absolute) was truncated");
+        }
+    }
+
+    // Normalize path (resolve any ".", "..", or "//")
+    char *normalizedPath = strdup(fixedPath);
+    if (!normalizedPath) {
+        DEBUG_FUNCTION_LINE_ERR("__fsa_fixpath: failed to allocate memory for normalizedPath");
+        free(fixedPath);
+        r->_errno = ENOMEM;
+        return NULL;
+    }
+
+    char *resPath = __fsa_normpath(normalizedPath, fixedPath);
+    if (!resPath) {
+        DEBUG_FUNCTION_LINE_ERR("__fsa_fixpath: failed to normalize path");
+        free(normalizedPath);
+        free(fixedPath);
+        r->_errno = EIO;
+        return NULL;
+    }
+
+    if (snprintf(fixedPath, maxPathLength, "%s", resPath) >= maxPathLength) {
+        DEBUG_FUNCTION_LINE_ERR("__fsa_fixpath: fixedPath snprintf result (relative) was truncated");
+    }
+
+    free(normalizedPath);
+
+    size_t pathLength = strlen(fixedPath);
+    if (pathLength > FS_MAX_PATH) {
+        free(fixedPath);
+        r->_errno = ENAMETOOLONG;
+        return NULL;
     }
 
     return fixedPath;
 }
 
-mode_t __fsa_translate_stat_mode(FSAStat *fileStat) {
+mode_t __fsa_translate_stat_mode(FSStat *fsStat) {
     mode_t retMode = 0;
 
-    if ((fileStat->flags & FS_STAT_LINK) == FS_STAT_LINK) {
+    if ((fsStat->flags & FS_STAT_LINK) == FS_STAT_LINK) {
         retMode |= S_IFLNK;
-    } else if ((fileStat->flags & FS_STAT_DIRECTORY) == FS_STAT_DIRECTORY) {
+    } else if ((fsStat->flags & FS_STAT_DIRECTORY) == FS_STAT_DIRECTORY) {
         retMode |= S_IFDIR;
-    } else if ((fileStat->flags & FS_STAT_FILE) == FS_STAT_FILE) {
+    } else if ((fsStat->flags & FS_STAT_FILE) == FS_STAT_FILE) {
         retMode |= S_IFREG;
-    } else if (fileStat->size == 0) {
+    } else if (fsStat->size == 0) {
         // Mounted paths like /vol/external01 have no flags set.
         // If no flag is set and the size is 0, it's a (root) dir
         retMode |= S_IFDIR;
-    } else if (fileStat->size > 0) {
+    } else if (fsStat->size > 0) {
         // Some regular Wii U files have no type info but will have a size
         retMode |= S_IFREG;
     }
 
     // Convert normal CafeOS hexadecimal permission bits into Unix octal permission bits
-    mode_t permissionMode = (((fileStat->mode >> 2) & S_IRWXU) | ((fileStat->mode >> 1) & S_IRWXG) | (fileStat->mode & S_IRWXO));
+    mode_t permissionMode = (((fsStat->mode >> 2) & S_IRWXU) | ((fsStat->mode >> 1) & S_IRWXG) | (fsStat->mode & S_IRWXO));
 
     return retMode | permissionMode;
 }
 
-void __fsa_translate_stat(FSAStat *fsStat, struct stat *posStat) {
+void __fsa_translate_stat(FSAClientHandle clientHandle, FSStat *fsStat, ino_t ino, struct stat *posStat) {
     memset(posStat, 0, sizeof(struct stat));
-    posStat->st_dev     = (dev_t) nullptr;
-    posStat->st_ino     = fsStat->entryId;
+    posStat->st_dev     = (dev_t) clientHandle;
+    posStat->st_ino     = ino;
     posStat->st_mode    = __fsa_translate_stat_mode(fsStat);
     posStat->st_nlink   = 1;
     posStat->st_uid     = fsStat->owner;
@@ -106,11 +214,6 @@ time_t __fsa_translate_time(FSTime timeValue) {
     return (timeValue / 1000000) + EPOCH_DIFF_SECS(WIIU_FSTIME_EPOCH_YEAR);
 }
 
-FSMode __fsa_translate_permission_mode(mode_t mode) {
-    // Convert normal Unix octal permission bits into CafeOS hexadecimal permission bits
-    return (FSMode) (((mode & S_IRWXU) << 2) | ((mode & S_IRWXG) << 1) | (mode & S_IRWXO));
-}
-
 int __fsa_translate_error(FSError error) {
     switch (error) {
         case FS_ERROR_END_OF_DIR:
@@ -139,56 +242,46 @@ int __fsa_translate_error(FSError error) {
         case FS_ERROR_NOT_FILE:
             return EISDIR;
         case FS_ERROR_OUT_OF_RANGE:
-            return ESPIPE;
+            return EINVAL;
         case FS_ERROR_UNSUPPORTED_COMMAND:
             return ENOTSUP;
         case FS_ERROR_WRITE_PROTECTED:
             return EROFS;
         case FS_ERROR_NOT_INIT:
             return ENODEV;
-            // TODO
         case FS_ERROR_MAX_MOUNT_POINTS:
-            break;
         case FS_ERROR_MAX_VOLUMES:
-            break;
         case FS_ERROR_MAX_CLIENTS:
-            break;
         case FS_ERROR_MAX_FILES:
-            break;
         case FS_ERROR_MAX_DIRS:
-            break;
+            return EMFILE;
         case FS_ERROR_ALREADY_OPEN:
-            break;
+            return EBUSY;
         case FS_ERROR_NOT_EMPTY:
-            break;
+            return ENOTEMPTY;
         case FS_ERROR_ACCESS_ERROR:
-            break;
+            return EACCES;
         case FS_ERROR_DATA_CORRUPTED:
-            break;
+            return EILSEQ;
         case FS_ERROR_JOURNAL_FULL:
-            break;
+            return EBUSY;
         case FS_ERROR_UNAVAILABLE_COMMAND:
-            break;
+            return EBUSY;
         case FS_ERROR_INVALID_PARAM:
-            break;
+            return EBUSY;
         case FS_ERROR_INVALID_BUFFER:
-            break;
         case FS_ERROR_INVALID_ALIGNMENT:
-            break;
         case FS_ERROR_INVALID_CLIENTHANDLE:
-            break;
         case FS_ERROR_INVALID_FILEHANDLE:
-            break;
         case FS_ERROR_INVALID_DIRHANDLE:
-            break;
+            return EINVAL;
         case FS_ERROR_OUT_OF_RESOURCES:
-            break;
+            return ENOMEM;
         case FS_ERROR_MEDIA_NOT_READY:
-            break;
+            return EIO;
         case FS_ERROR_INVALID_MEDIA:
-            break;
+            return EIO;
         default:
-            break;
+            return EIO;
     }
-    return (int) EIO;
 }

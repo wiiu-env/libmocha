@@ -1,12 +1,16 @@
+#include "../logger.h"
 #include "devoptab_fsa.h"
-#include "logger.h"
-#include <mutex>
 
 int __fsa_statvfs(struct _reent *r,
                   const char *path,
                   struct statvfs *buf) {
-    FSError status;
     uint64_t freeSpace;
+
+    const auto *deviceData = static_cast<__fsa_device_t *>(r->deviceData);
+    if (deviceData->isSDCard) {
+        r->_errno = ENOSYS;
+        return -1;
+    }
 
     memset(buf, 0, sizeof(struct statvfs));
 
@@ -16,9 +20,7 @@ int __fsa_statvfs(struct _reent *r,
         return -1;
     }
 
-    auto *deviceData = (FSADeviceData *) r->deviceData;
-
-    status = FSAGetFreeSpaceSize(deviceData->clientHandle, fixedPath, &freeSpace);
+    const FSError status = FSAGetFreeSpaceSize(deviceData->clientHandle, fixedPath, &freeSpace);
     if (status < 0) {
         DEBUG_FUNCTION_LINE_ERR("FSAGetFreeSpaceSize(0x%08X, %s, %p) failed: %s",
                                 deviceData->clientHandle, fixedPath, &freeSpace, FSAGetStatusStr(status));

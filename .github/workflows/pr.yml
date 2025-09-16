@@ -6,7 +6,7 @@ jobs:
   clang-format:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: clang-format
       run: |
         docker run --rm -v ${PWD}:/src ghcr.io/wiiu-env/clang-format:13.0.0-2 -r ./source ./include
@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: clang-format
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: build lib
       run: |
         docker build . -f Dockerfile.buildlocal -t builder

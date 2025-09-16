@@ -1,25 +1,25 @@
+#include "../logger.h"
 #include "devoptab_fsa.h"
-#include "logger.h"
 #include <mutex>
 
 int __fsa_dirclose(struct _reent *r,
                    DIR_ITER *dirState) {
-    FSError status;
 
     if (!dirState) {
         r->_errno = EINVAL;
         return -1;
     }
 
-    auto *dir        = (__fsa_dir_t *) (dirState->dirStruct);
-    auto *deviceData = (FSADeviceData *) r->deviceData;
+    auto *dir = static_cast<__fsa_dir_t *>(dirState->dirStruct);
 
-    std::lock_guard<MutexWrapper> lock(dir->mutex);
+    const auto deviceData = static_cast<__fsa_device_t *>(r->deviceData);
 
-    status = FSACloseDir(deviceData->clientHandle, dir->fd);
+    std::scoped_lock lock(dir->mutex);
+
+    const FSError status = FSACloseDir(deviceData->clientHandle, dir->fd);
     if (status < 0) {
         DEBUG_FUNCTION_LINE_ERR("FSACloseDir(0x%08X, 0x%08X) (%s) failed: %s",
-                                deviceData->clientHandle, dir->fd, dir->name, FSAGetStatusStr(status));
+                                deviceData->clientHandle, dir->fd, dir->fullPath, FSAGetStatusStr(status));
         r->_errno = __fsa_translate_error(status);
         return -1;
     }

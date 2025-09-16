@@ -1,29 +1,26 @@
+#include "../logger.h"
 #include "devoptab_fsa.h"
-#include "logger.h"
 #include <mutex>
 
 int __fsa_mkdir(struct _reent *r,
                 const char *path,
                 int mode) {
-    FSError status;
-    char *fixedPath;
-
     if (!path) {
         r->_errno = EINVAL;
         return -1;
     }
 
-    fixedPath = __fsa_fixpath(r, path);
+    char *fixedPath = __fsa_fixpath(r, path);
     if (!fixedPath) {
         r->_errno = ENOMEM;
         return -1;
     }
 
-    auto *deviceData = (FSADeviceData *) r->deviceData;
+    auto *deviceData = static_cast<__fsa_device_t *>(r->deviceData);
 
-    FSMode translatedMode = __fsa_translate_permission_mode(mode);
+    const FSMode translatedMode = __fsa_translate_permission_mode(mode);
 
-    status = FSAMakeDir(deviceData->clientHandle, fixedPath, translatedMode);
+    const FSError status = FSAMakeDir(deviceData->clientHandle, fixedPath, translatedMode);
     if (status < 0) {
         DEBUG_FUNCTION_LINE_ERR("FSAMakeDir(0x%08X, %s, 0x%X) failed: %s",
                                 deviceData->clientHandle, fixedPath, translatedMode, FSAGetStatusStr(status));

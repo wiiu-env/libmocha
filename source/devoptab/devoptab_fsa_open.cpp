@@ -1,5 +1,5 @@
+#include "../logger.h"
 #include "devoptab_fsa.h"
-#include "logger.h"
 #include <mutex>
 
 // Extended "magic" value that allows opening files with FS_OPEN_FLAG_UNENCRYPTED in underlying FSOpenFileEx() call similar to O_DIRECTORY
@@ -33,6 +33,12 @@ int __fsa_open(struct _reent *r,
         fsMode = "w";
     } else if (((flags & O_ACCMODE) == O_RDWR) && ((flags & commonFlagMask) == (O_CREAT | O_TRUNC))) {
         fsMode = "w+";
+    } else if (((flags & O_ACCMODE) == O_WRONLY) && ((flags & commonFlagMask) == O_CREAT) && (flags & O_EXCL) == O_EXCL) {
+        // if O_EXCL is set, we don't need O_TRUNC
+        fsMode = "w";
+    } else if (((flags & O_ACCMODE) == O_RDWR) && ((flags & commonFlagMask) == O_CREAT) && (flags & O_EXCL) == O_EXCL) {
+        // if O_EXCL is set, we don't need O_TRUNC
+        fsMode = "w+";
     } else if (((flags & O_ACCMODE) == O_WRONLY) && ((flags & commonFlagMask) == (O_CREAT | O_APPEND))) {
         fsMode = "a";
     } else if (((flags & O_ACCMODE) == O_RDWR) && ((flags & commonFlagMask) == (O_CREAT | O_APPEND))) {
@@ -43,6 +49,10 @@ int __fsa_open(struct _reent *r,
         // It's not possible to open a file with write only mode which doesn't truncate the file
         // Technically we could read from the file, but our read implementation is blocking this.
         fsMode = "r+";
+    } else if (((flags & O_ACCMODE) == O_RDWR) && ((flags & commonFlagMask) == (O_CREAT))) {
+        // Cafe OS doesn't have a matching mode for this, so we have to be creative and create the file.
+        createFileIfNotFound = true;
+        fsMode               = "r+";
     } else if (((flags & O_ACCMODE) == O_WRONLY) && ((flags & commonFlagMask) == (O_APPEND))) {
         // Cafe OS doesn't have a matching mode for this, so we have to check if the file exists.
         failIfFileNotFound = true;
@@ -62,8 +72,13 @@ int __fsa_open(struct _reent *r,
         return -1;
     }
 
-    auto *file = (__fsa_file_t *) fileStruct;
-    strncpy(file->fullPath, fixedPath, sizeof(file->fullPath) - 1);
+
+    auto *file            = static_cast<__fsa_file_t *>(fileStruct);
+    const auto deviceData = static_cast<__fsa_device_t *>(r->deviceData);
+
+    if (snprintf(file->fullPath, sizeof(file->fullPath), "%s", fixedPath) >= (int) sizeof(file->fullPath)) {
+        DEBUG_FUNCTION_LINE_ERR("__fsa_open: snprintf result was truncated");
+    }
     free(fixedPath);
 
     // Prepare flags
@@ -73,9 +88,7 @@ int __fsa_open(struct _reent *r,
 
     // Init mutex and lock
     file->mutex.init(file->fullPath);
-    std::lock_guard<MutexWrapper> lock(file->mutex);
-
-    auto *deviceData = (FSADeviceData *) r->deviceData;
+    std::scoped_lock lock(file->mutex);
 
     if (createFileIfNotFound || failIfFileNotFound || (flags & (O_EXCL | O_CREAT)) == (O_EXCL | O_CREAT)) {
         // Check if file exists
@@ -113,9 +126,11 @@ int __fsa_open(struct _reent *r,
 
     status = FSAOpenFileEx(deviceData->clientHandle, file->fullPath, fsMode, translatedMode, openFlags, preAllocSize, &fd);
     if (status < 0) {
-        DEBUG_FUNCTION_LINE_ERR("FSAOpenFileEx(0x%08X, %s, %s, 0x%X, 0x%08X, 0x%08X, %p) failed: %s",
-                                deviceData->clientHandle, file->fullPath, fsMode, translatedMode, openFlags, preAllocSize, &fd,
-                                FSAGetStatusStr(status));
+        if (status != FS_ERROR_NOT_FOUND) {
+            DEBUG_FUNCTION_LINE_ERR("FSAOpenFileEx(0x%08X, %s, %s, 0x%X, 0x%08X, 0x%08X, %p) failed: %s",
+                                    deviceData->clientHandle, file->fullPath, fsMode, translatedMode, openFlags, preAllocSize, &fd,
+                                    FSAGetStatusStr(status));
+        }
         r->_errno = __fsa_translate_error(status);
         return -1;
     }

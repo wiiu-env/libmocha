@@ -1,11 +1,9 @@
+#include "../logger.h"
 #include "devoptab_fsa.h"
-#include "logger.h"
 #include <mutex>
 
 int __fsa_rmdir(struct _reent *r,
                 const char *name) {
-    FSError status;
-
     if (!name) {
         r->_errno = EINVAL;
         return -1;
@@ -17,14 +15,14 @@ int __fsa_rmdir(struct _reent *r,
         return -1;
     }
 
-    auto *deviceData = (FSADeviceData *) r->deviceData;
+    const auto *deviceData = static_cast<__fsa_device_t *>(r->deviceData);
 
-    status = FSARemove(deviceData->clientHandle, fixedPath);
+    const FSError status = FSARemove(deviceData->clientHandle, fixedPath);
     if (status < 0) {
         DEBUG_FUNCTION_LINE_ERR("FSARemove(0x%08X, %s) failed: %s",
                                 deviceData->clientHandle, fixedPath, FSAGetStatusStr(status));
         free(fixedPath);
-        r->_errno = status == FS_ERROR_ALREADY_EXISTS ? ENOTEMPTY : __fsa_translate_error(status);
+        r->_errno = __fsa_translate_error(status);
         return -1;
     }
 

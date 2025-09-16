@@ -1,11 +1,10 @@
+#include "../logger.h"
 #include "devoptab_fsa.h"
-#include "logger.h"
 #include <mutex>
 
 int __fsa_stat(struct _reent *r,
                const char *path,
                struct stat *st) {
-    FSError status;
     FSAStat fsStat;
 
     if (!path || !st) {
@@ -19,18 +18,22 @@ int __fsa_stat(struct _reent *r,
         return -1;
     }
 
-    auto *deviceData = (FSADeviceData *) r->deviceData;
+    const auto deviceData = static_cast<__fsa_device_t *>(r->deviceData);
 
-    status = FSAGetStat(deviceData->clientHandle, fixedPath, &fsStat);
+    const FSError status = FSAGetStat(deviceData->clientHandle, fixedPath, &fsStat);
     if (status < 0) {
-        DEBUG_FUNCTION_LINE_ERR("FSAGetStat(0x%08X, %s, %p) failed: %s",
-                                deviceData->clientHandle, fixedPath, &fsStat, FSAGetStatusStr(status));
+        if (status != FS_ERROR_NOT_FOUND) {
+            DEBUG_FUNCTION_LINE_ERR("FSAGetStat(0x%08X, %s, %p) failed: %s",
+                                    deviceData->clientHandle, fixedPath, &fsStat, FSAGetStatusStr(status));
+        }
         free(fixedPath);
         r->_errno = __fsa_translate_error(status);
         return -1;
     }
+    const ino_t ino = __fsa_hashstring(fixedPath);
     free(fixedPath);
 
-    __fsa_translate_stat(&fsStat, st);
+    __fsa_translate_stat(deviceData->clientHandle, &fsStat, ino, st);
+
     return 0;
 }

@@ -1,5 +1,5 @@
+#include "../logger.h"
 #include "devoptab_fsa.h"
-#include "logger.h"
 #include <mutex>
 
 off_t __fsa_seek(struct _reent *r,
@@ -15,10 +15,11 @@ off_t __fsa_seek(struct _reent *r,
         return -1;
     }
 
-    auto *file       = (__fsa_file_t *) fd;
-    auto *deviceData = (FSADeviceData *) r->deviceData;
+    const auto file = static_cast<__fsa_file_t *>(fd);
 
-    std::lock_guard<MutexWrapper> lock(file->mutex);
+    const auto deviceData = static_cast<__fsa_device_t *>(r->deviceData);
+
+    std::scoped_lock lock(file->mutex);
 
     // Find the offset to see from
     switch (whence) {

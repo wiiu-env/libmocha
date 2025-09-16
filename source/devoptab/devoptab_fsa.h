@@ -13,23 +13,24 @@
 #include <unistd.h>
 
 typedef struct FSADeviceData {
-    devoptab_t device{};
-    bool setup{};
-    bool mounted{};
+    devoptab_t device;
+    bool setup;
+    bool mounted;
+    bool isSDCard;
     uint32_t id{};
-    char name[32]{};
-    char mount_path[256]{};
-    FSAClientHandle clientHandle{};
-    uint64_t deviceSizeInSectors{};
-    uint32_t deviceSectorSize{};
-} FSADeviceData;
+    char name[32];
+    char mountPath[0x80];
+    char cwd[FS_MAX_PATH + 1];
+    FSAClientHandle clientHandle;
+    uint64_t deviceSizeInSectors;
+    uint32_t deviceSectorSize;
+} __fsa_device_t;
 
 /**
  * Open file struct
  */
-typedef struct
-{
-    //! FS handle
+typedef struct {
+    //! FSA file handle
     FSAFileHandle fd;
 
     //! Flags used in open(2)
@@ -38,7 +39,7 @@ typedef struct
     //! Current file offset
     uint32_t offset;
 
-    //! Path stored for internal path tracking
+    //! Current file path
     char fullPath[FS_MAX_PATH + 1];
 
     //! Guard file access
@@ -52,17 +53,17 @@ typedef struct
  * Open directory struct
  */
 typedef struct {
-    //! Should be set to FS_DIRITER_MAGIC
+    //! Should be set to FSA_DIRITER_MAGIC
     uint32_t magic;
 
-    //! FS handle
+    //! FS directory handle
     FSADirectoryHandle fd;
 
     //! Temporary storage for reading entries
     FSADirectoryEntry entry_data;
 
-    //! Current file path
-    char name[FS_MAX_PATH + 1];
+    //! Current directory path
+    char fullPath[FS_MAX_PATH + 1];
 
     //! Guard dir access
     MutexWrapper mutex;
@@ -105,13 +106,20 @@ int __fsa_fchmod(struct _reent *r, void *fd, mode_t mode);
 int __fsa_rmdir(struct _reent *r, const char *name);
 int __fsa_utimes(struct _reent *r, const char *filename, const struct timeval times[2]);
 
-// devoptab_fs_utils.c
+// devoptab_fsa_utils.c
 char *__fsa_fixpath(struct _reent *r, const char *path);
 int __fsa_translate_error(FSError error);
+mode_t __fsa_translate_stat_mode(FSStat *fsStat);
+void __fsa_translate_stat(FSAClientHandle handle, FSStat *fsStat, ino_t ino, struct stat *posStat);
+uint32_t __fsa_hashstring(const char *str);
+
+static inline FSMode
+__fsa_translate_permission_mode(mode_t mode) {
+    // Convert normal Unix octal permission bits into CafeOS hexadecimal permission bits
+    return (FSMode) (((mode & S_IRWXU) << 2) | ((mode & S_IRWXG) << 1) | (mode & S_IRWXO));
+}
+
 time_t __fsa_translate_time(FSTime timeValue);
-FSMode __fsa_translate_permission_mode(mode_t mode);
-mode_t __fsa_translate_stat_mode(FSAStat *fileStat);
-void __fsa_translate_stat(FSAStat *fsStat, struct stat *posStat);
 
 #ifdef __cplusplus
 }

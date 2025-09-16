@@ -1,5 +1,5 @@
+#include "../logger.h"
 #include "devoptab_fsa.h"
-#include "logger.h"
 #include <mutex>
 
 int __fsa_fchmod(struct _reent *r,
