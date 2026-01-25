@@ -23,6 +23,27 @@ uint32_t mochaApiVersion = 0;
 #define IOCTL_KERN_WRITE32   0x07
 #define IOCTL_READ_OTP       0x08
 
+namespace {
+    MochaUtilsStatus doSimpleCustomIPCCommand(const uint32_t cmd, const uint32_t arg1 = 0, const uint32_t arg2 = 0) {
+        MochaUtilsStatus res = MOCHA_RESULT_UNKNOWN_ERROR;
+        int mcpFd            = IOS_Open("/dev/mcp", static_cast<IOSOpenMode>(0));
+        if (mcpFd >= 0) {
+            ALIGN_0x40 uint32_t io_buffer[0x40 / 4];
+            io_buffer[0] = cmd;
+            io_buffer[1] = arg1;
+            io_buffer[2] = arg2;
+
+            if (IOS_Ioctl(mcpFd, 100, io_buffer, 0xC, io_buffer, 0x4) == IOS_ERROR_OK) {
+                res = MOCHA_RESULT_SUCCESS;
+            }
+
+            IOS_Close(mcpFd);
+        }
+        return res;
+    }
+} // namespace
+
+
 const char *Mocha_GetStatusStr(MochaUtilsStatus status) {
     switch (status) {
         case MOCHA_RESULT_SUCCESS:
@@ -341,21 +362,41 @@ MochaUtilsStatus Mocha_StartUSBLogging(bool notSkipExistingLogs) {
     if (mochaApiVersion < 1) {
         return MOCHA_RESULT_UNSUPPORTED_COMMAND;
     }
-    MochaUtilsStatus res = MOCHA_RESULT_UNKNOWN_ERROR;
-    int mcpFd            = IOS_Open("/dev/mcp", (IOSOpenMode) 0);
-    if (mcpFd >= 0) {
-        ALIGN_0x40 uint32_t io_buffer[0x40 / 4];
-        io_buffer[0] = IPC_CUSTOM_START_USB_LOGGING;
-        io_buffer[1] = notSkipExistingLogs;
 
-        if (IOS_Ioctl(mcpFd, 100, io_buffer, 8, io_buffer, 0x4) == IOS_ERROR_OK) {
-            res = MOCHA_RESULT_SUCCESS;
-        }
+    return doSimpleCustomIPCCommand(IPC_CUSTOM_START_USB_LOGGING, notSkipExistingLogs);
+}
 
-        IOS_Close(mcpFd);
+MochaUtilsStatus Mocha_StartTCPSyslogLogging(bool limitToIp, uint32_t ipFilter) {
+    if (!mochaInitDone) {
+        return MOCHA_RESULT_LIB_UNINITIALIZED;
+    }
+    if (mochaApiVersion < 2) {
+        return MOCHA_RESULT_UNSUPPORTED_COMMAND;
     }
 
-    return res;
+    return doSimpleCustomIPCCommand(IPC_CUSTOM_START_TCP_LOGGING, limitToIp, ipFilter);
+}
+
+MochaUtilsStatus Mocha_StopTCPSyslogLogging() {
+    if (!mochaInitDone) {
+        return MOCHA_RESULT_LIB_UNINITIALIZED;
+    }
+    if (mochaApiVersion < 2) {
+        return MOCHA_RESULT_UNSUPPORTED_COMMAND;
+    }
+
+    return doSimpleCustomIPCCommand(IPC_CUSTOM_STOP_TCP_LOGGING);
+}
+
+MochaUtilsStatus Mocha_StartIOPShellServer() {
+    if (!mochaInitDone) {
+        return MOCHA_RESULT_LIB_UNINITIALIZED;
+    }
+    if (mochaApiVersion < 2) {
+        return MOCHA_RESULT_UNSUPPORTED_COMMAND;
+    }
+
+    return doSimpleCustomIPCCommand(IPC_CUSTOM_START_IOPSHELL_SERVER);
 }
 
 MochaUtilsStatus Mocha_UnlockFSClient(FSClient *client) {

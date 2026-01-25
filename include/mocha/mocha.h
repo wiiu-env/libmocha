@@ -153,9 +153,38 @@ MochaUtilsStatus Mocha_GetEnvironmentPath(char *environmentPathBuffer, uint32_t 
  * @return MOCHA_RESULT_SUCCESS:                Logging via USB starts or has already been started<br>
  *         MOCHA_RESULT_LIB_UNINITIALIZED:      Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
  *         MOCHA_RESULT_UNSUPPORTED_COMMAND:    Command not supported by the currently loaded mocha version.<br>
- *         MOCHA_RESULT_UNKNOWN_ERROR:          Failed to retrieve the environment path.
+ *         MOCHA_RESULT_UNKNOWN_ERROR:          Failed to start the usb logging.
  */
 MochaUtilsStatus Mocha_StartUSBLogging(bool notSkipExistingLogs);
+
+/**
+ * Enables logging via TCP via OSReport and friends. See the tcp script for receiving logs<br>
+ * @param limitToIp If set to true, only connection to the ip specified in "ipFilter" will be accepted
+ * @param ipFilter Defined the ip address the console will connect for usb logs
+ * @return MOCHA_RESULT_SUCCESS:                Logging via TCP starts or has already been started<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:      Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND:    Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR:          Failed to start
+ */
+MochaUtilsStatus Mocha_StartTCPSyslogLogging(bool limitToIp, uint32_t ipFilter);
+
+/**
+ * Disabled logging via TCP. <br>
+ * @return MOCHA_RESULT_SUCCESS:                Logging via stops<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:      Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND:    Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR:          Failed to stop
+ */
+MochaUtilsStatus Mocha_StopTCPSyslogLogging();
+
+/**
+ * Starts the iopshell server. <br>
+ * @return MOCHA_RESULT_SUCCESS:                IOPShell server starts or has already been started<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:      Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND:    Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_UNKNOWN_ERROR:          Failed to start
+ */
+MochaUtilsStatus Mocha_StartIOPShellServer();
 
 /**
  * Gives a FSClient full permissions. <br>
