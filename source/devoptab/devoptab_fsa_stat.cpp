@@ -23,7 +23,7 @@ int __fsa_stat(struct _reent *r,
 
     status = FSAGetStat(deviceData->clientHandle, fixedPath, &fsStat);
     if (status < 0) {
-        DEBUG_FUNCTION_LINE_ERR("FSAGetStat(0x%08X, %s, 0x%08X) failed: %s",
+        DEBUG_FUNCTION_LINE_ERR("FSAGetStat(0x%08X, %s, %p) failed: %s",
                                 deviceData->clientHandle, fixedPath, &fsStat, FSAGetStatusStr(status));
         free(fixedPath);
         r->_errno = __fsa_translate_error(status);

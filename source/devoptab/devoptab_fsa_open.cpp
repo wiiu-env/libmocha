@@ -92,7 +92,7 @@ int __fsa_open(struct _reent *r,
                     }
                     fd = -1;
                 } else {
-                    DEBUG_FUNCTION_LINE_ERR("FSAOpenFileEx(0x%08X, %s, %s, 0x%X, 0x%08X, 0x%08X, 0x%08X) failed: %s",
+                    DEBUG_FUNCTION_LINE_ERR("FSAOpenFileEx(0x%08X, %s, %s, 0x%X, 0x%08X, 0x%08X, %p) failed: %s",
                                             deviceData->clientHandle, file->fullPath, "w", translatedMode, openFlags, preAllocSize, &fd,
                                             FSAGetStatusStr(status));
                     r->_errno = __fsa_translate_error(status);
@@ -113,7 +113,7 @@ int __fsa_open(struct _reent *r,
 
     status = FSAOpenFileEx(deviceData->clientHandle, file->fullPath, fsMode, translatedMode, openFlags, preAllocSize, &fd);
     if (status < 0) {
-        DEBUG_FUNCTION_LINE_ERR("FSAOpenFileEx(0x%08X, %s, %s, 0x%X, 0x%08X, 0x%08X, 0x%08X) failed: %s",
+        DEBUG_FUNCTION_LINE_ERR("FSAOpenFileEx(0x%08X, %s, %s, 0x%X, 0x%08X, 0x%08X, %p) failed: %s",
                                 deviceData->clientHandle, file->fullPath, fsMode, translatedMode, openFlags, preAllocSize, &fd,
                                 FSAGetStatusStr(status));
         r->_errno = __fsa_translate_error(status);
@@ -129,11 +129,11 @@ int __fsa_open(struct _reent *r,
         FSAStat stat;
         status = FSAGetStatFile(deviceData->clientHandle, fd, &stat);
         if (status < 0) {
-            DEBUG_FUNCTION_LINE_ERR("FSAGetStatFile(0x%08X, 0x%08X, 0x%08X) (%s) failed: %s",
+            DEBUG_FUNCTION_LINE_ERR("FSAGetStatFile(0x%08X, 0x%08X, %p) (%s) failed: %s",
                                     deviceData->clientHandle, fd, &stat, file->fullPath, FSAGetStatusStr(status));
             r->_errno = __fsa_translate_error(status);
             if (FSACloseFile(deviceData->clientHandle, fd) < 0) {
-                DEBUG_FUNCTION_LINE_ERR("FSACloseFile(0x%08X, 0x%08X) (%d) failed: %s",
+                DEBUG_FUNCTION_LINE_ERR("FSACloseFile(0x%08X, 0x%08X) (%s) failed: %s",
                                         deviceData->clientHandle, fd, file->fullPath, FSAGetStatusStr(status));
             }
             return -1;

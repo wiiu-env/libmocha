@@ -28,7 +28,7 @@ __fsa_diropen(struct _reent *r,
     auto *deviceData = (FSADeviceData *) r->deviceData;
     status           = FSAOpenDir(deviceData->clientHandle, dir->name, &fd);
     if (status < 0) {
-        DEBUG_FUNCTION_LINE_ERR("FSAOpenDir(0x%08X, %s, 0x%08X) failed: %s",
+        DEBUG_FUNCTION_LINE_ERR("FSAOpenDir(0x%08X, %s, %p) failed: %s",
                                 deviceData->clientHandle, dir->name, &fd, FSAGetStatusStr(status));
         r->_errno = __fsa_translate_error(status);
         return nullptr;

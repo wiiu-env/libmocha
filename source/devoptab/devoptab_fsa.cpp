@@ -4,6 +4,7 @@
 #include <coreinit/cache.h>
 #include <coreinit/filesystem_fsa.h>
 #include <mutex>
+#include <string>
 
 static const devoptab_t fsa_default_devoptab = {
         .structSize   = sizeof(__fsa_file_t),
@@ -166,7 +167,7 @@ MochaUtilsStatus Mocha_MountFSEx(const char *virt_name, const char *dev_path, co
     if (dev_path) {
         res = FSAMount(mount->clientHandle, dev_path, mount_path, mountFlags, mountArgBuf, mountArgBufLen);
         if (res < 0) {
-            DEBUG_FUNCTION_LINE_ERR("FSAMount(0x%08X, %s, %s, %08X, %08X, %08X) failed: %s", mount->clientHandle, dev_path, mount_path, mountFlags, mountArgBuf, mountArgBufLen, FSAGetStatusStr(res));
+            DEBUG_FUNCTION_LINE_ERR("FSAMount(0x%08X, %s, %s, %08X, %p, %08X) failed: %s", mount->clientHandle, dev_path, mount_path, mountFlags, mountArgBuf, mountArgBufLen, FSAGetStatusStr(res));
             fsa_free(mount);
             if (res == FS_ERROR_ALREADY_EXISTS) {
                 return MOCHA_RESULT_ALREADY_EXISTS;

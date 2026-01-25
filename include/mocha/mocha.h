@@ -4,6 +4,7 @@
 #include <coreinit/filesystem.h>
 #include <coreinit/filesystem_fsa.h>
 #include <stdint.h>
+#include <sysapp/args.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -214,6 +215,20 @@ MochaUtilsStatus Mocha_PrepareRPXLaunch(MochaRPXLoadInfo *loadInfo);
  *         MOCHA_RESULT_NOT_FOUND:              Not application that can be used as homebrew wrapper found.
  */
 MochaUtilsStatus Mocha_LaunchHomebrewWrapper();
+
+/**
+ * Launches the wrapper app for launching .rpx, with custom SYS args.  <br>
+ * To launch a RPX call `Mocha_PrepareRPXLaunch` before this function. <br>
+ * <br>
+ * see: `Mocha_LaunchRPX` to prepare and launch a RPX in one command.
+ *
+ * @param args sysapp args to pass to the homebrew app.
+ * @return MOCHA_RESULT_SUCCESS: App is launching<br>
+ *         MOCHA_RESULT_LIB_UNINITIALIZED:      Library was not initialized. Call Mocha_InitLibrary() before using this function.<br>
+ *         MOCHA_RESULT_UNSUPPORTED_COMMAND:    Command not supported by the currently loaded mocha version.<br>
+ *         MOCHA_RESULT_NOT_FOUND:              Not application that can be used as homebrew wrapper found.
+ */
+MochaUtilsStatus Mocha_LaunchHomebrewWrapperEx(SYSStandardArgsIn *args);
 
 /**
  * Launches a given RPX by launching a wrapper application and replacing the RPX on the fly. <br>

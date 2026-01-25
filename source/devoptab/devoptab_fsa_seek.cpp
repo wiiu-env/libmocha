@@ -33,7 +33,7 @@ off_t __fsa_seek(struct _reent *r,
         case SEEK_END: { // Set position relative to the end of the file
             status = FSAGetStatFile(deviceData->clientHandle, file->fd, &fsStat);
             if (status < 0) {
-                DEBUG_FUNCTION_LINE_ERR("FSAGetStatFile(0x%08X, 0x%08X, 0x%08X) (%s) failed: %s",
+                DEBUG_FUNCTION_LINE_ERR("FSAGetStatFile(0x%08X, 0x%08X, %p) (%s) failed: %s",
                                         deviceData->clientHandle, file->fd, &fsStat, file->fullPath, FSAGetStatusStr(status));
                 r->_errno = __fsa_translate_error(status);
                 return -1;
